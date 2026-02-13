@@ -1,0 +1,263 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath, amssymb, amsfonts, amsthm}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{dsfont}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usetikzlibrary{patterns.meta}
+
+\title{Digital signal processing}
+\author{}
+
+%math operators%
+\newcommand{\Jac}{J}
+
+\begin{document}
+
+\newcommand{\todo}[1]{\begingroup \color{red} #1 \endgroup}
+
+%common sets%
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+
+\newcommand{\curlyA}{\mathcal{A}}
+\newcommand{\curlyB}{\mathcal{B}}
+\newcommand{\curlyC}{\mathcal{C}}
+\newcommand{\curlyP}{\mathcal{P}}
+\newcommand{\curlyL}{\mathcal{L}}
+
+%linear algebra%
+\newcommand{\innerpr}[2]{\left\langle #1, #2 \right\rangle}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\spanof}{\operatorname{span}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\Ker}{\operatorname{Ker}}
+\newcommand{\Img}{\operatorname{Im}}
+\newcommand{\mat}[1]{\begin{pmatrix} #1 \end{pmatrix}}
+
+%other%
+\newcommand{\ind}{\mathds{1}}
+\newcommand{\dx}[1]{\, \mathrm{d}#1}
+
+%blocks%
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+
+\maketitle
+\tableofcontents
+
+\newpage
+\section{Conventions}
+Let $f:\mathbb{R} \to \mathbb{C}$ be a $2\pi$-periodic, integrable function.
+The Fourier coefficients of $f$ are defined by
+\[
+    \hat f(k)
+    =
+    \frac{1}{2\pi}\int_0^{2\pi} f(x)\,e^{-ikx} \dx{x},
+    \quad k \in \mathbb{Z}.
+\]
+
+The Fourier series of $f$ is given by
+\[
+    f(x)
+    \;=\;
+    \sum_{k\in\mathbb{Z}} \hat f(k)\,e^{ikx}
+\]
+
+For $2\pi$-periodic functions $f,g \colon \mathbb{R}\to\mathbb{C}$ we define the
+circular convolution by
+\[
+    (f * g)(x)
+    \;=\;
+    \int_0^{2\pi} f(y)\,g(x-y) \dx{y}
+\]
+
+The root of unity:
+\[\omega_N = e^{\frac{2\pi i}{N}}\]
+
+\newpage
+\section{DFT}
+\begin{lemma} The following holds for roots of unity:
+    \begin{enumerate}[label=\thelemma.\arabic*]
+        \item $\omega_N^{kN} = 1 \; \forall{k\in \Z}$ \label{lm:roots of unity cyclicity}
+        \item $N$ even. $\omega_{N/2} = \omega_N^2$ \label{lm:roots of unity fft}
+        \item $\overline{\omega_{N}} = \omega_N^{-1}$ \label{lm:roots of unity conjugate}
+    \end{enumerate}
+\end{lemma}
+\begin{proof} \hfill
+    \begin{enumerate}
+        \item
+              \[\omega_N^N
+                  = {\left(e^{\frac{2\pi i}{N}}\right)}^N
+                  = e^{\frac{2\pi iN}{N}}
+                  = e^{2\pi i}
+                  = \cos(2\pi) + i \sin(2\pi) = 1\]
+
+              Then:
+              \[\omega_N^{kN}
+                  = {\left(\omega_N^{N}\right)}^k = 1^k = 1\]
+
+        \item $\omega_{N/2}
+                  = e^{\frac{2\pi i}{N/2}}
+                  = e^{2\cdot \frac{2\pi i}{N}}
+                  = {\left(e^{\frac{2\pi i}{N}}\right)}^2
+                  = \omega_N^2$
+        \item $\overline{\omega_{N}}
+                  = \overline{e^{\frac{2\pi i}{N}}}
+                  = e^{-\frac{2\pi i}{N}}
+                      = {\left(e^{\frac{2\pi i}{N}}\right)}^{-1}
+                  = \omega_N^{-1}$
+    \end{enumerate}
+\end{proof}
+
+Suppose we have $f: \mathbb{R} \rightarrow \mathbb{C}$ which is $2\pi$-periodic.
+Consider the values of this function at points $\frac{0\cdot 2\pi}{N}$,  $\frac{1\cdot 2\pi}{N}$, ..., $\frac{(N-1)\cdot 2\pi}{N}$:
+\[x_j:= \frac{j\cdot 2\pi}{N}\]
+\[y_j := f(x_j)
+    = \sum_{k=-\infty}^\infty \hat{f}(k)e^{ikx_j}
+    = \sum_{k=-\infty}^\infty \hat{f}(k)e^{2\pi i\frac{kj}{N}}
+    = \sum_{k=-\infty}^\infty \hat{f}(k)\omega_N^{kj}\]
+
+By Lemma~\ref{lm:roots of unity cyclicity} we have that
+$\omega_N^{(k+nN)j}
+    = \omega_N^{kj}\omega_N^{(nj)N}
+    = \omega_N^{kj}$
+
+By grouping the terms with $k_1 = k_2 \mod N$ and obtain the following:
+
+\begin{equation}
+    y_j
+    = \sum_{k = 0}^{N-1} \omega_N^{kj} \left(\sum_{n=-\infty}^{\infty} \hat{f}(k+nN) \right)
+    = \sum_{k =0}^{N-1} \omega_N^{kj} z_k
+    \label{eq:IDFT unnormalized}
+\end{equation}
+
+We define the matrix $F_{kj} = \frac{1}{\sqrt N} \omega_N^{kj}$. Then:
+\begin{equation}
+    y_j = \sqrt{N}{(Fz)}_j \Rightarrow
+    y = \sqrt{N}Fz \Rightarrow
+    z = \frac{1}{\sqrt{N}}F^{-1}y
+    \label{eq:DFT unnormalized}
+\end{equation}
+
+Later we use the vector $z$ to indicate the output of the DFT, namely $F^{-1}y$
+
+The crucial observation is that the oscillation of the form $e^{i (k+nN)x}$ for $n>0$ and $k \in {0, ..., N-1}$ cannot be detected using the given discretized points. This simply follows from the fact that
+$e^{i (k+nN)x_j}
+    = e^{i (k+nN)\frac{j\cdot 2\pi}{N}}
+    = e^{i\frac{kj\cdot 2\pi}{N}}e^{2\pi i\cdot nj}
+    = e^{2\pi i\frac{kj}{N}}
+    = e^{ikx_j} $ as computed previously. Even though the original signal might have an oscillation with rate above $N$, we are unable to detect it using the discrete values of the function $f$, therefore we may just assume each $z_k$ corresponds to the coefficient $\hat{f}(k)$ (basically, contribution of the waves correspoding to the frequencies above $N$ cannot be distinguished from the wave with the respective frequency in the range from $0$ to $N-1$). In sound processing this doesn't pose any issue since human ear cannot hear any frequency above 20 khz, so with enough discretization we basically do not lose any perceivable data.
+
+\begin{theorem} \label{thm:DFT unitary}
+    The matrix $F_{kj} = \frac{1}{\sqrt N} \omega_N^{kj}$ is unitary
+\end{theorem}
+\begin{proof}
+    \[\begin{aligned}
+            {(F \overline{F^T})}_{jl}
+            = \frac{1}{\sqrt N}\overline{\left(\frac{1}{\sqrt N}\right)}\sum_{k=0}^{N-1}F_{lk}{(\overline{F^T})}_{kl}
+            = \frac{1}{N} \sum_{k=0}^{N-1}F_{jk}\overline{F_{lk}}
+             & = \\ \frac{1}{N} \sum_{k=0}^{N-1}\omega_N^{jk}\overline{\omega_N^{lk}}
+            \underset{(a)}{=} \frac{1}{N} \sum_{k=0}^{N-1}\omega_N^{jk}\omega_N^{-lk}
+            = \frac{1}{N} \sum_{k=0}^{N-1}\omega_N^{(j-l)k}
+        \end{aligned}\]
+
+    In (a) we used the identity $\overline{\omega_N^{lk}} = \omega_N^{-lk}$ from Lemma~\ref{lm:roots of unity conjugate}
+
+    \begin{enumerate}
+        \item $j \neq l$. Using the formula for sum of geometric series:
+              \[
+                  \sum_{k=0}^{N-1}{\left( \omega_N^{(j-l)k} \right)}^{k}
+                  = \frac{1 - {\left(\omega_N^{(j-l)k}\right)}^N}{1 - \omega^{(j-l)k}}
+                  = \frac{1 - {\left(\omega_N^{N}\right)}^{(j-l)k}}{1 - \omega^{(j-l)k}}
+                  \underset{(a)}{=} \frac{1 - 1^{(j-l)k}}{1 - \omega^{(j-l)k}}
+                  = 0\]
+              In (a) we used the identity $\omega_N^{N} = 1$ from Lemma~\ref{lm:roots of unity cyclicity}.
+              The condition $j \neq l$ ensures that the denominator is non-zero, so the expression is well-defined.
+        \item $j = l$. Then:
+              \[\sum_{k=0}^{N-1}{\left( \omega_N^{(j-l)k} \right)}^{k}
+                  = \sum_{k=0}^{N-1}1
+                  = N \Rightarrow
+                  {(F \overline{F^T})}_{jl} = \frac{1}{N}N=1\]
+    \end{enumerate}
+
+    The matrix $F\overline{F} = I$, so $F$ unitary and $F^{-1}=\overline{F^T}$
+
+    The entries of $F^{-1}$ arre given by
+    $F^{-1}_{ij} = (\overline{F_{ji}}) = \overline{\omega_N^{ji}} = \omega_N^{-ij}$.
+\end{proof}
+
+Using the result of Theorem~$\ref{thm:DFT unitary}$ and equations $\eqref{eq:DFT unnormalized}$, $\eqref{eq:IDFT unnormalized}$ we define the discrete Fourier transform:
+\begin{equation}
+    z_j
+    = {(F^{-1}y)}_j
+    = \frac{1}{\sqrt{N}}\sum_{k =0}^{N-1} \omega_N^{-kj} z_k
+    \label{eq:DFT} \tag{DFT}
+\end{equation}
+\begin{equation}
+    y_j
+    = {(Fy)}_j
+    = \frac{1}{\sqrt{N}}\sum_{k =0}^{N-1} \omega_N^{kj} z_k
+    \label{eq:IDFT} \tag{IDFT}
+\end{equation}
+
+\begin{theorem}[Real signal conjugate symmetry] \label{thm: real signal symmetry}
+    Let $N$ be even. The following are equivalent:
+
+    \begin{enumerate}
+        \item $y = \overline{y}, y\in \C^N$
+        \item $z_{j} = \overline{z_{N-j}} \;\forall j \in \{1, \dots, N/2-1\}$ and $z_0, z_{N/2} \in \R$
+    \end{enumerate}
+\end{theorem}
+\begin{proof} \hfill \break
+    $"(1)\Rightarrow (2)"$ Using the formula for \ref{eq:DFT}
+    \[\begin{aligned}
+            z_j
+            = \frac{1}{\sqrt N} \sum_{k=0}^{N-1} \omega_N^{-kj}y_k
+            = \frac{1}{\sqrt N} \sum_{k=0}^{N-1} \overline{\omega_N^{kj}} y_k
+            \underset{y=\overline{y}}{=} \frac{1}{\sqrt N} \sum_{k=0}^{N-1} \overline{\omega_N^{kj}y_k}
+             & = \\ \overline{ \left(\frac{1}{\sqrt N} \sum_{k=0}^{N-1} \omega_N^{kj} y_k \right)}
+            \underset{\omega_N^N=1}{=} \overline{ \left(\frac{1}{\sqrt N} \sum_{k=0}^{N-1} \omega_N^{-N}\omega_N^{kj} y_k \right)}
+             & = \\ \overline{ \left(\frac{1}{\sqrt N} \sum_{k=0}^{N-1} \omega_N^{-(N-kj)} y_k \right)}
+            = \overline{z_{N-j}}
+        \end{aligned}\]
+    \[z_0
+        = \frac{1}{\sqrt N} \sum_{k=0}^{N-1} \omega_N^{-k\cdot 0}y_k
+        = \frac{1}{\sqrt N} \sum_{k=0}^{N-1} y_k \in \R\]
+    Observe:
+    \[\omega_N^{-k\cdot N/2}
+        = {(e^{-2\pi i \frac{N/2}{N}})}^k
+        = {(e^{-\pi i})}^k = {(-1)}^k\]
+    \[z_{N/2}
+        = \frac{1}{\sqrt N} \sum_{k=0}^{N-1} \omega_N^{-k\cdot N/2}y_k
+        = \frac{1}{\sqrt N} \sum_{k=0}^{N-1} {(-1)}^k y_k \in \R\]
+
+    \noindent $"(2)\Rightarrow (1)"$ Using the formula for \ref{eq:IDFT}
+    \begin{equation}
+        \begin{aligned}
+            y_j
+            = \frac{1}{\sqrt{N}}\sum_{k =0}^{N-1} \omega_N^{kj} z_k = \frac{1}{\sqrt{N}} \left(z_0 + z_{N/2} + \sum_{k = 1}^{N/2-1} \omega_N^{kj} z_k + \sum_{l = N/2+1}^{N-1} \omega_N^{lj} z_l\right)
+        \end{aligned} \label{eq: real signal symmetry inv 1}
+    \end{equation}
+    \[\begin{aligned}
+            \sum_{k = 1}^{N/2-1} \omega_N^{kj} z_k + \sum_{l = N/2+1}^{N-1} \omega_N^{lj} z_l
+            \underset{l'=N-l}{=} \sum_{k = 1}^{N/2-1} \omega_N^{kj} z_k + \sum_{l = 1}^{N/2-1} \omega_N^{(N-l)j} z_{N-l}
+             & = \\ \sum_{k = 1}^{N/2-1} \left(\omega_N^{kj} z_k + \omega_N^{(N-k)j} z_{N-k}\right)
+            = \sum_{k = 1}^{N/2-1} \left(\omega_N^{kj} z_k + \overline{\omega_N^{kj}z_k}\right) \in \R
+        \end{aligned}\]
+    By plugging this expression back to \eqref{eq: real signal symmetry inv 1} we get:
+    \[\eqref{eq: real signal symmetry inv 1}
+    = \frac{1}{\sqrt{N}} \left(z_0 + z_{N/2} + \sum_{k = 1}^{N/2-1} \left(\omega_N^{kj} z_k + \overline{\omega_N^{kj}z_k}\right)\right) \in \R\]
+    since all the summands and the factor in front are real.
+\end{proof}
+
+\newpage
+\section{FFT}
+\end{document}
