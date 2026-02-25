@@ -13,7 +13,9 @@
 \author{}
 
 %math operators%
-\newcommand{\Jac}{J}
+\DeclareMathOperator{\Jac}{J}
+\DeclareMathOperator{\real}{Re}
+\DeclareMathOperator{\imag}{Im}
 
 \begin{document}
 
@@ -49,6 +51,8 @@
 %blocks%
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}{Lemma}[section]
+\theoremstyle{definition}
+\newtheorem{algorithm}{Algorithm}[section]
 
 \maketitle
 \tableofcontents
@@ -73,11 +77,12 @@ The Fourier series of $f$ is given by
 
 For $2\pi$-periodic functions $f,g \colon \mathbb{R}\to\mathbb{C}$ we define the
 circular convolution by
-\[
+\begin{equation}
     (f * g)(x)
     \;=\;
     \int_0^{2\pi} f(y)\,g(x-y) \dx{y}
-\]
+    \label{eq:convolution}
+\end{equation}
 
 The root of unity:
 \[\omega_N = e^{\frac{2\pi i}{N}}\]
@@ -89,6 +94,7 @@ The root of unity:
         \item $\omega_N^{kN} = 1 \; \forall{k\in \Z}$ \label{lm:roots of unity cyclicity}
         \item $N$ even. $\omega_{N/2} = \omega_N^2$ \label{lm:roots of unity fft}
         \item $\overline{\omega_{N}} = \omega_N^{-1}$ \label{lm:roots of unity conjugate}
+        \item $\omega_{N}^{kN/2} = {(-1)}^k \; \forall{k\in \Z}$\label{lm:roots of unity half spin}
     \end{enumerate}
 \end{lemma}
 \begin{proof} \hfill
@@ -99,8 +105,6 @@ The root of unity:
                   = e^{\frac{2\pi iN}{N}}
                   = e^{2\pi i}
                   = \cos(2\pi) + i \sin(2\pi) = 1\]
-
-              Then:
               \[\omega_N^{kN}
                   = {\left(\omega_N^{N}\right)}^k = 1^k = 1\]
 
@@ -114,6 +118,9 @@ The root of unity:
                   = e^{-\frac{2\pi i}{N}}
                       = {\left(e^{\frac{2\pi i}{N}}\right)}^{-1}
                   = \omega_N^{-1}$
+        \item $\omega_N^{k\cdot N/2}
+                  = {(e^{2\pi i \frac{N/2}{N}})}^k
+                  = {(e^{\pi i})}^k = {(-1)}^k$
     \end{enumerate}
 \end{proof}
 
@@ -191,9 +198,9 @@ $e^{i (k+nN)x_j}
     The matrix $FF^* = I$, so $F$ unitary and $F^{-1}=\overline{F^T}$
 
     The entries of $F^{-1}$ are given by
-    $F^{-1}_{ij} = (\overline{F_{ji}}) 
-    = \frac{1}{\sqrt{N}}\overline{\left(\omega_N^{ji}\right)} 
-    = \frac{1}{\sqrt{N}}\omega_N^{-ij}$.
+    $F^{-1}_{ij} = (\overline{F_{ji}})
+        = \frac{1}{\sqrt{N}}\overline{\left(\omega_N^{ji}\right)}
+        = \frac{1}{\sqrt{N}}\omega_N^{-ij}$.
 \end{proof}
 
 Using the result of Theorem~\ref{thm:DFT unitary} and equations \eqref{eq:DFT unnormalized}, \eqref{eq:IDFT unnormalized} we define the discrete Fourier transform:
@@ -233,19 +240,16 @@ Using the result of Theorem~\ref{thm:DFT unitary} and equations \eqref{eq:DFT un
     \[z_0
         = \frac{1}{\sqrt N} \sum_{k=0}^{N-1} \omega_N^{-k\cdot 0}y_k
         = \frac{1}{\sqrt N} \sum_{k=0}^{N-1} y_k \in \R\]
-    Observe:
-    \[\omega_N^{-k\cdot N/2}
-        = {(e^{-2\pi i \frac{N/2}{N}})}^k
-        = {(e^{-\pi i})}^k = {(-1)}^k\]
+    By Lemma~\ref{lm:roots of unity half spin}:
     \[z_{N/2}
-        = \frac{1}{\sqrt N} \sum_{k=0}^{N-1} \omega_N^{-k\cdot N/2}y_k
+        = \frac{1}{\sqrt N} \sum_{k=0}^{N-1} \omega_N^{-k N/2}y_k
         = \frac{1}{\sqrt N} \sum_{k=0}^{N-1} {(-1)}^k y_k \in \R\]
 
     \noindent $"(2)\Rightarrow (1)"$ Using the formula for \ref{eq:IDFT}
     \begin{equation}
         \begin{aligned}
             y_j
-            = \frac{1}{\sqrt{N}}\sum_{k =0}^{N-1} \omega_N^{kj} z_k 
+            = \frac{1}{\sqrt{N}}\sum_{k =0}^{N-1} \omega_N^{kj} z_k
             = \frac{1}{\sqrt{N}} \left(z_0 + {(-1)}^jz_{N/2} + \sum_{k = 1}^{N/2-1} \omega_N^{kj} z_k + \sum_{l = N/2+1}^{N-1} \omega_N^{lj} z_l\right)
         \end{aligned} \label{eq: real signal symmetry inv 1}
     \end{equation}
@@ -257,10 +261,223 @@ Using the result of Theorem~\ref{thm:DFT unitary} and equations \eqref{eq:DFT un
         \end{aligned}\]
     By plugging this expression back to \eqref{eq: real signal symmetry inv 1} we get:
     \[\eqref{eq: real signal symmetry inv 1}
-    = \frac{1}{\sqrt{N}} \left(z_0 + {(-1)}^jz_{N/2} + \sum_{k = 1}^{N/2-1} \left(\omega_N^{kj} z_k + \overline{\omega_N^{kj}z_k}\right)\right) \in \R\]
+        = \frac{1}{\sqrt{N}} \left(z_0 + {(-1)}^jz_{N/2} + \sum_{k = 1}^{N/2-1} \left(\omega_N^{kj} z_k + \overline{\omega_N^{kj}z_k}\right)\right) \in \R\]
     since all the summands and the factor in front are real.
 \end{proof}
 
 \newpage
 \section{FFT}
+\begin{theorem} \label{FFT}
+    Let $y\in \C^N$ and $N$ is even. $K = N/2$. Let:
+    \[y^{(1)} = {(y_0, y_2, ..., y_{2K-2})}^T \quad y^{(2)} = {(y_1, y_3, ..., y_{2K-1})}^T\]
+    \[z^{(1)} = F_K^{-1} y^{(1)} \quad z^{(2)} = F_K^{-1} y^{(2)}\]
+
+    Then:
+    \[z_j = \frac{1}{\sqrt {2}} \left(z^{(1)}_j + \omega_N^{-j} z^{(2)}_j\right) \; \forall j\in \{0, \dots, K - 1\}\]
+    \[z_{j+K} = \frac{1}{\sqrt {2}} \left(z^{(1)}_j - \omega_N^{-j} z^{(2)}_j\right) \; \forall j\in \{0, \dots, K - 1\}\]
+    where $z = F_N^{-1}y$
+\end{theorem}
+\begin{proof}
+    \begin{equation}
+        \begin{aligned}
+            z_j
+            = \frac{1}{\sqrt N} \sum_{k=0}^{N-1} \omega_N^{-kj}y_k
+            = \frac{1}{\sqrt N} \left(\sum_{\substack{k=0             \\ k\; \text{even}}}^{N-1} \omega_N^{-kj}y_k
+            + \sum_{\substack{k=0                                     \\ k\; \text{odd}}}^{N-1} \omega_N^{-kj}y_k \right)
+             & =                                                      \\ \frac{1}{\sqrt N} \left(\sum_{k=0}^{K-1} \omega_N^{-2kj}y_{2k}
+            + \sum_{k=0}^{K-1} \omega_N^{-{(2k+1)}j}y_{2k+1} \right)
+             & \underset{\text{Lemma}~\ref{lm:roots of unity fft}}{=} \\ \frac{1}{\sqrt N} \left(\sum_{k=0}^{K-1} \omega_K^{-kj}y_{2k}
+            + \omega_N^{-j}\sum_{k=0}^{K-1} \omega_K^{-kj}y_{2k+1} \right)
+             & =                                                      \\ \frac{1}{\sqrt 2\sqrt K} \left(\sum_{k=0}^{K-1} \omega_K^{-kj}y_{2k}
+            + \omega_N^{-j}\sum_{k=0}^{K-1} \omega_K^{-kj}y_{2k+1} \right)
+        \end{aligned} \label{eq:FFT raw}
+    \end{equation}
+
+    For $j\in \{0, \dots, K-1\}$ we get the claim immediately. We now focus on the case, when $j = j' + K \in \{K, \dots, N-1\}$. The equation \eqref{eq:FFT raw} becomes:
+    \[\begin{aligned}
+            \sqrt{2K}z_j
+            = \sum_{k=0}^{K-1} \omega_K^{-k(j'+K)}y_{2k} + \omega_N^{-(j'+K)}\sum_{k=0}^{K-1} \omega_K^{-k(j'+K)}y_{2k+1}
+             & =                                                            \\ \sum_{k=0}^{K-1} \omega_K^{-kj'}y_{2k}
+            + \omega_N^{-j'}\omega_N^{-K}\sum_{k=0}^{K-1} \omega_K^{-kj'}y_{2k+1}
+             & \underset{\text{Lemma}~\ref{lm:roots of unity half spin}}{=} \\ \sum_{k=0}^{K-1} \omega_K^{-kj'}y_{2k} - \omega_N^{-j'}\sum_{k=0}^{K-1} \omega_K^{-kj'}y_{2k+1}
+        \end{aligned}\]
+    which proves the second part of the claim.
+\end{proof}
+By extending the idea of the idea of the Theorem~\ref{FFT} we formulate the following algorithm:
+
+\begin{algorithm} \label{alg:FFT} \hfill \break
+    \noindent \textbf{Input:} $y\in \C^N$, $N$ is a power of two, $n>1$
+
+    \noindent \textbf{Procedure:}
+
+    \textbf{if} $N>n$:
+
+    Get $z^{(1)}$, $z^{(2)}$ by calling Algorithm~\ref{alg:FFT} on $y^{(1)}$, $y^{(2)}$. This is well defined since $N/2$ is a power of two
+
+    \[z_j = \frac{1}{\sqrt {2}} \left(z^{(1)}_j + \omega_N^{-j} z^{(2)}_j\right) \; \forall j\in \{0, \dots, K - 1\}\]
+    \[z_{j+K} = \frac{1}{\sqrt {2}} \left(z^{(1)}_j - \omega_N^{-j} z^{(2)}_j\right) \; \forall j\in \{0, \dots, K - 1\}\]
+
+    \indent \indent \textbf{return} z
+
+    \textbf{else}:
+
+    \indent \indent \textbf{return} $F^{-1}y$ (see the expression \ref{eq:DFT})
+\end{algorithm}
+
+\newpage
+\section{Ideal LPF}
+\begin{lemma} Let $f, g:\R\to \R$ be piecewise continuous and bounded. Then:
+    \begin{enumerate}[label=\thelemma.\arabic*]
+        \item $f$ is measurable and integrable on $[0,2\pi]$\label{eq: piecewise cts msb}
+        \item $f*g$ is measurable \label{eq: convolution msb}
+    \end{enumerate}
+\end{lemma}
+\begin{proof}
+    \begin{enumerate}
+        \item Let $D \subset \R$ be the set of all discontinuities of $f$. We have that $D$ has finitely many elements by definition of piecewise continuity. For any set $M \in \curlyB$ we have the following:
+              \[\begin{aligned}
+                      f^{-1}(M)
+                       & = \left(f^{-1}(M) \cap D\right) \cup \left(f^{-1}(M) \setminus D\right)                                 \\
+                       & = \left(f^{-1}(M) \cap D\right) \cup \left({\left(\left.f\right|_{\R\setminus D}\right)}^{-1}(M)\right)
+                  \end{aligned}\]
+
+              We have $\left(f^{-1}(M) \cap D\right) \subset D$, so it is finite and hence is Borel measurable, $\left.f\right|_{\R\setminus D}$ is a measurable mapping since $\R\setminus D$ is a Borel set and the restriction is continuous on its domain. Thus, $f^{-1}(M)$ is the union of two measurable sets, so is measurable as well. That proves measurability of $f$.
+
+              Since $f$ is bounded, we have:
+              \[\int_{[0, 2\pi]} |f(x)| \dx{x} \leq \int_{[0, 2\pi]} M \dx{x} \leq 2\pi M \leq \infty\]
+
+              Thus $f$ is integrable on an interval $[0, 2\pi]$. Moreover $f\in L^\infty$, because the boundedness argument stays valid for $f^p \; \forall p\in \N$
+        \item This claim follows from the fact that $f*g$ is continuous for $f, g \in L^\infty$. The proof of this is given in Proposition 3.1.5 in \cite{fourier}
+    \end{enumerate}
+\end{proof}
+
+\begin{theorem}[Convolution theorem] \label{thm:convolution theorem}
+    Let $f, g:\R\to \R$ be $2\pi$ periodic piecewise continuous and bounded. Then:
+    \[\frac{1}{2\pi}\widehat{f*g}(k) = \hat{f}(k) \hat{g}(k)\]
+\end{theorem}
+
+\begin{proof}
+    \[\begin{aligned}
+            2\pi\cdot \widehat{f*g}(k)
+             & = \int_{0}^{2\pi} f*g(x) e^{-ikx} \dx{x}                                                                                   \\
+             & \underset{\eqref{eq:convolution}}{=} \int_{0}^{2\pi} \left(\int_{0}^{2\pi} f(y)g(x-y) \dx{y} \right) \cdot e^{-ikx} \dx{x} \\
+             & = \int_{0}^{2\pi} \int_{0}^{2\pi} f(y)g(x-y) e^{-ikx} \dx{y} \dx{x}
+        \end{aligned}\]
+
+    Note that the convolution is well defined since by Lemma~\ref{eq: convolution msb} $f*g$ is measurable. Let $F(x,y) = f(y)g(x-y) e^{-ikx}$.
+    \[|\real(F(x, y))|, |\imag(F(x, y))| \leq |F(x, y)| = |f(y)g(x-y)| \leq C < \infty\]
+    since both $f$ and $g$ are bounded.
+    \[\begin{aligned}
+            \int_{{[0,2\pi]}^2} |\real(F)(x,y)| \dx{\lambda^2(x,y)}
+             & \leq \int_{\mathbb{R}^2} C\cdot \ind_{{[0,2\pi]}^2}(x,y) \dx{\lambda^2(x,y)} \\
+             & = C \lambda^2({[0,2\pi]}^2)
+            = 4\pi^2 C < \infty
+        \end{aligned}\]
+
+    The same holds for $\imag(F)$. Since the function $F$ is absolutely integrable on ${[0, 2\pi]}^2$ we can use Fubini's theorem:
+    \[\begin{aligned}
+            \int_{0}^{2\pi} \int_{0}^{2\pi} F(x,y) \dx{y} \dx{x}
+             & = \\ \int_{0}^{2\pi} \int_{0}^{2\pi} \mathrm{Re}(F(x,y)) \dx{y} \dx{x}  + i \int_{0}^{2\pi} \int_{0}^{2\pi} \mathrm{Im}(F(x,y)) \dx{y} \dx{x}
+             & = \\ \int_{0}^{2\pi} \int_{0}^{2\pi} \mathrm{Re}(F(x,y)) \dx{x} \dx{y}  + i \int_{0}^{2\pi} \int_{0}^{2\pi} \mathrm{Im}(F(x,y)) \dx{x} \dx{y}
+             & = \\ \int_{0}^{2\pi} \int_{0}^{2\pi} F(x,y) \dx{x} \dx{y}
+            = \int_{0}^{2\pi} \int_{0}^{2\pi} f(y)g(x-y) e^{-iky}e^{-ik(x-y)} \dx{x} \dx{y}
+             & = \\ \int_{0}^{2\pi} f(y) e^{-iky} \int_{0}^{2\pi} g(x-y) e^{-ik(x-y)} \dx{x} \dx{y}
+        \end{aligned}\]
+
+    Do the substitution $t = x-y$, $\frac{\partial t}{\partial x} = 1$
+    \[\begin{aligned}
+            \int_{0}^{2\pi} f(y) e^{-iky} \int_{0}^{2\pi} g(x-y) e^{-ik(x-y)} \dx{x} \dx{y}
+             & = \\ \int_{0}^{2\pi} f(y) e^{-iky} \int_{-y}^{2\pi-y}g(t) e^{-ikt} \dx{t} \dx{y}
+             & = \\ \int_{0}^{2\pi} f(y) e^{-iky} \int_{0}^{2\pi}g(t) e^{-ikt} \dx{t} \dx{y}
+             & = \\ 2\pi\int_{0}^{2\pi} f(y) e^{-iky} \hat{g}(k) \dx{y} = 4\pi^2\hat{g}(k) \hat{f}(k)\end{aligned}\]
+
+    Thus:
+    \[2\pi\widehat{f*g}(k)
+        = 4\pi^2\hat{g}(k) \hat{f}(k) \Rightarrow
+        \frac{1}{2\pi}\widehat{f*g}(k)
+        = \hat{g}(k) \hat{f}(k)\]
+\end{proof}
+
+Using this knowledge we can derive an ideal low pass filter.
+\[z_i = \begin{cases} 0, \;i \in [k;n-k) \\ 1, \; \text{otherwise} \end{cases}\]
+
+Using the formula for \ref{eq:IDFT}:
+\[\begin{aligned}
+        y_{j} = \sum_{l=0}^{N-1} F_{jl} z_k
+        = \sum_{l=0}^{k-1} F_{jl} + \sum_{l=N-k}^{N-1} F_{jl}
+        = \frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k-1} \omega_N^{jl} + \sum_{l=N-k}^{N-1} \omega_N^{jl} \right)
+    \end{aligned}\]
+
+Substitute $l = N-m-1$ in the second sum:
+\[\begin{aligned}
+        \frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k-1} \omega_N^{jl} + \sum_{l=N-k}^{N-1} \omega_N^{jl} \right) =
+        \frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k-1} \omega_N^{jl} + \sum_{m=0}^{k-1} \omega_N^{j(N-m-1)} \right)
+         & =                                               \\ \frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k-1} \omega_N^{jl} + \sum_{m=0}^{k-1} \omega_N^{j(N-m-1)} \right)
+        =\frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k-1} \omega_N^{jl} + \sum_{m=0}^{k-1} \omega_N^{jN} \omega_N^{-j} \omega_N^{-jm} \right)
+         & \underset{\ref{lm:roots of unity cyclicity}}{=} \\ \frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k-1} \omega_N^{jl} + \omega_N^{-j} \sum_{m=0}^{k-1} \omega_N^{-jm} \right)
+    \end{aligned}\]
+
+Let $j\neq 0$. Using the sum of geometric series:
+\[\sum_{l=0}^{k-1} \omega_N^{jl} = \sum_{l=0}^{k-1} {\left(\omega_N^{j}\right)}^l = \frac{1 - {\left(\omega_N^{j}\right)}^k}{1 - \omega_N^j}\]
+
+Similarly:
+\[\begin{aligned}
+        \omega_N^{-j}\sum_{l=0}^{k-1} \omega_N^{-jl}
+        = \omega_N^{-j}\sum_{l=0}^{k-1} {\left(\omega_N^{-j}\right)}^l
+        = \frac{\omega_N^{-j} - \omega_N^{-j}{\left(\omega_N^{-j}\right)}^k}{1 - \omega_N^{-j}}
+         & = \\ \frac{\omega_N^{-j} - \omega_N^{-j}{\left(\omega_N^{-j}\right)}^k}{1 - \omega_N^{-j}} \frac{\omega_N^j}{\omega_N^j}
+        = \frac{1 - {\left(\omega_N^{-j}\right)}^k}{\omega_N^{j} - 1}
+        = \frac{{\left(\omega_N^{-j}\right)}^k - 1}{1 - \omega_N^{j}}
+    \end{aligned}\]
+
+By combining the terms together:
+\[
+    \sum_{l=0}^{k-1} \omega_N^{jl} + \omega_N^{-j} \sum_{l=0}^{k-1} \omega_N^{-jl}
+    = \frac{1 - {\left(\omega_N^{j}\right)}^k}{1 - \omega_N^j} + \frac{{\left(\omega_N^{-j}\right)}^k - 1}{1 - \omega_N^{j}}
+    = \frac{\omega^{-jk} - \omega^{jk}}{1 - \omega_N^{j}}\]
+
+This yields the following expression for $y_j$, when $j\neq 0$:
+\[y_{j}  = \frac{1}{\sqrt{N}} \frac{\omega_N^{-jk} - \omega_N^{jk}}{1 - \omega_N^{j}}\]
+
+If $j = 0$, then all the summands are equal to one, so get just $2k/N$. 
+By the direct analogy to Theorem $\ref{thm:convolution theorem}$:
+\[\frac{1}{\sqrt N}(F(x\circledast y)) = Fx \odot Fy\]
+which allows to implement the low pass filter using its impulse response. That is the point, where theory meets the real world example and makes use of the abstract theorem. In general this concept can be generlaized to any signal, which can be used for example for reverb implementation if we have an impulse response of a room (a recording of echo induced by a short impact, for example a clap).
+
+Now we take a closer look on the expression we derive above:
+\[
+    e^{-ix}-e^{ix} = 2\imag(e^{-ix}) = 2i\sin(-x) = -2i\sin(x)\]
+\[
+    1-e^{ix}
+    = e^{\frac{ix}{2}}\left(e^{-\frac{ix}{2}} - e^{\frac{ix}{2}}\right)
+    = -2i\cdot e^{\frac{ix}{2}} \sin \left(\frac{x}{2}\right)\]
+
+Therefore:
+\[
+    1 - \omega_N^{j} = 1-e^{2\pi i\frac{j}{N}}
+    = -2i\cdot e^{\frac{\pi i\cdot j}{N}} \sin \left(\frac{\pi j}{N}\right)\]
+\[
+    \omega_N^{-jk} - \omega_N^{jk}
+    = e^{-2\pi i\frac{kj}{N}}-e^{2\pi i\frac{kj}{N}}
+    = -2i \sin\left(\frac{2\pi kj}{N}\right)\]
+\[
+    \frac{\omega_N^{-jk} - \omega_N^{jk}}{1 - \omega_N^{j}}
+    = \frac{-2i \sin\left(\frac{2\pi kj}{N}\right)}{-2i\cdot e^{\frac{\pi i\cdot j}{N}} \sin \left(\frac{\pi j}{N}\right)}
+    = \frac{e^{-\frac{\pi i\cdot j}{N}} \sin\left(\frac{2\pi kj}{N}\right)}{\sin \left(\frac{\pi j}{N}\right)}\]
+
+With $x_j = 2\pi j / N$ we have:
+\[
+    \frac{e^{-\frac{\pi i\cdot j}{N}} \sin\left(\frac{2\pi kj}{N}\right)}{\sin \left(\frac{\pi j}{N}\right)}
+    = \frac{e^{-ix_j/2} \sin\left(kx_j\right)}{\sin \left(x_j/2\right)}
+    = \frac{\cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)} - i \sin\left(kx_j\right)\]
+For small $x$ we have $\sin(x) \approx x$ and $\cos(x) \approx 1$, so whenever $x_j$ is small enough we have the following estimate:
+\[
+    \frac{\cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)} - i \sin\left(kx_j\right)
+    \approx \frac{\sin(kx_j)}{x_j/2} - i\sin(kx_j)\]
+which becomes 
+\[\frac{1}{\sqrt{N}}  \left(\frac{2\sin(kx_j)}{x_j} - i \sin(kx_j)\right)\] after normalization.
+\begin{thebibliography}{8}
+    \bibitem{fourier}
+    Elias M. Stein and Rami Shakarchi (2003) \emph{Fourier Analysis: An Introduction}
+\end{thebibliography}
 \end{document}
