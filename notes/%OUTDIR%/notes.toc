@@ -1,0 +1,4 @@
+\contentsline {section}{\numberline {1}Conventions}{2}{section.1}%
+\contentsline {section}{\numberline {2}DFT}{3}{section.2}%
+\contentsline {section}{\numberline {3}FFT}{7}{section.3}%
+\contentsline {section}{\numberline {4}Ideal LPF}{9}{section.4}%

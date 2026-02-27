@@ -51,6 +51,8 @@
 %blocks%
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}{Lemma}[section]
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}[section]
 \theoremstyle{definition}
 \newtheorem{algorithm}{Algorithm}[section]
 
@@ -326,45 +328,59 @@ By extending the idea of the idea of the Theorem~\ref{FFT} we formulate the foll
 
 \newpage
 \section{Ideal LPF}
-\begin{lemma} Let $f, g:\R\to \R$ be piecewise continuous and bounded. Then:
-    \begin{enumerate}[label=\thelemma.\arabic*]
-        \item $f$ is measurable and integrable on $[0,2\pi]$\label{eq: piecewise cts msb}
-        \item $f*g$ is measurable \label{eq: convolution msb}
-    \end{enumerate}
+\begin{lemma} \label{lm:piecewise cts msb} Let $f:\R\to \R$ have countably many discontinuities. Then $f$ is measurable
 \end{lemma}
 \begin{proof}
     \begin{enumerate}
-        \item Let $D \subset \R$ be the set of all discontinuities of $f$. We have that $D$ has finitely many elements by definition of piecewise continuity. For any set $M \in \curlyB$ we have the following:
-              \[\begin{aligned}
+        \item Let $D \subset \R$ be the set of all discontinuities of $f$. We have that $D$ has countably many elements. For any set $M \in \curlyB$ we have the following:
+              \begin{equation}
+                  \begin{aligned}
                       f^{-1}(M)
                        & = \left(f^{-1}(M) \cap D\right) \cup \left(f^{-1}(M) \setminus D\right)                                 \\
                        & = \left(f^{-1}(M) \cap D\right) \cup \left({\left(\left.f\right|_{\R\setminus D}\right)}^{-1}(M)\right)
-                  \end{aligned}\]
+                  \end{aligned} \label{eq:null set preimage split}
+              \end{equation}
 
-              We have $\left(f^{-1}(M) \cap D\right) \subset D$, so it is finite and hence is Borel measurable, $\left.f\right|_{\R\setminus D}$ is a measurable mapping since $\R\setminus D$ is a Borel set and the restriction is continuous on its domain. Thus, $f^{-1}(M)$ is the union of two measurable sets, so is measurable as well. That proves measurability of $f$.
-
-              Since $f$ is bounded, we have:
-              \[\int_{[0, 2\pi]} |f(x)| \dx{x} \leq \int_{[0, 2\pi]} M \dx{x} \leq 2\pi M \leq \infty\]
-
-              Thus $f$ is integrable on an interval $[0, 2\pi]$. Moreover $f\in L^\infty$, because the boundedness argument stays valid for $f^p \; \forall p\in \N$
-        \item This claim follows from the fact that $f*g$ is continuous for $f, g \in L^\infty$. The proof of this is given in Proposition 3.1.5 in \cite{fourier}
+              We have $\left(f^{-1}(M) \cap D\right) \subset D$, so it is countable and hence is Borel measurable, $\left.f\right|_{\R\setminus D}$ is a measurable mapping since $\R\setminus D$ is a Borel set and the restriction is continuous on its domain. Thus, $f^{-1}(M)$ is the union of two measurable sets, so is measurable as well. That proves measurability of $f$.
     \end{enumerate}
 \end{proof}
+\begin{remark}
+    The statement of the Lemma~\ref{lm:piecewise cts msb} can be relaxed to the set of discontinuities having measure zero.
+    Let $F$ be a generalized distribution function (monotonous and right continuous). Then the following mapping defines an outer measure:
+    \[\begin{aligned}
+            \mu^*:\curlyP(\R) & \to [0;\infty], A \mapsto                                                                                                            \\
+                              & \inf\left\{\sum_{n=1}^{\infty} F(b_n) - F(a_n): A\subset \bigcup_{n=1}^{\infty} (a_n; b_n], \; a_n < b_n \; \forall n \in \N\right\}
+        \end{aligned}\]
+    The Lebesgue measure is $\mu = \mu^*\big|_\curlyB$ for $F(x) = x$. However we know that $\curlyB \subset \mathcal{L} := \{A\subset \R: A \; \text{is} \; \mu^* \; \text{meaurable}\}$. However we cannot guarantee $\curlyB = \mathcal{L}$ ($\mathcal{L}$ is a sigma algebra by Caratheodori restriction theorem)
+
+    Consider a set $N \subset \R$ with $\mu^*(N) = 0$. For any $B \subset \R$:
+    \[\mu^*(B) =\mu^*((B \cap N) \cup (B \cap N^C))
+        \leq \mu^*(B \cap N) + \mu^*(B \cap N^C)\]
+    by sigma subadditivity of $\mu^*$. Moreover by monotonicty of $\mu^*$ we have that $\mu^*(B\cap N) \leq \mu^*(N) = 0$, so $\mu^*(B \cap N^C) \geq \mu^*(B)$. By applying monotonicty again $\mu^*(B \cap N^C) \leq \mu^*(B)$, so $\mu^*(B \cap N^C) = \mu^*(B)$. By combining those results together we obtain $\mu^*(B) = \mu^*(B \cap N) + \mu^*(B \cap N^C)$, so $N \in \mathcal{M}$
+
+    Now take a look at \eqref{eq:null set preimage split}:
+    \[
+        f^{-1}(M)
+        = \left(f^{-1}(M) \cap D\right) \cup \left({\left(\left.f\right|_{\R\setminus D}\right)}^{-1}(M)\right)\]
+
+    The set $f^{-1}(M) \cap D \subset D$, so it is a null set and hence is in $\mathcal{L}$. Also we know that ${\left(\left.f\right|_{\R\setminus D}\right)}^{-1}(M) \subset \curlyB \subset \mathcal{L}$, which implies $f^{-1}(M) \subset \mathcal{L}$. Therefore $f$ is $\mathcal{L} \to \curlyB$ measurable.
+\end{remark}
 
 \begin{theorem}[Convolution theorem] \label{thm:convolution theorem}
     Let $f, g:\R\to \R$ be $2\pi$ periodic piecewise continuous and bounded. Then:
     \[\frac{1}{2\pi}\widehat{f*g}(k) = \hat{f}(k) \hat{g}(k)\]
 \end{theorem}
-
 \begin{proof}
-    \[\begin{aligned}
+    \begin{equation}
+        \begin{aligned}
             2\pi\cdot \widehat{f*g}(k)
              & = \int_{0}^{2\pi} f*g(x) e^{-ikx} \dx{x}                                                                                   \\
              & \underset{\eqref{eq:convolution}}{=} \int_{0}^{2\pi} \left(\int_{0}^{2\pi} f(y)g(x-y) \dx{y} \right) \cdot e^{-ikx} \dx{x} \\
              & = \int_{0}^{2\pi} \int_{0}^{2\pi} f(y)g(x-y) e^{-ikx} \dx{y} \dx{x}
-        \end{aligned}\]
+        \end{aligned} \label{eq:conv thm coef def}
+    \end{equation}
 
-    Note that the convolution is well defined since by Lemma~\ref{eq: convolution msb} $f*g$ is measurable. Let $F(x,y) = f(y)g(x-y) e^{-ikx}$.
+    Let $F(x,y) = f(y)g(x-y) e^{-ikx}$. We have that both $f, g$ are measurabe by Lemma~\ref{lm:piecewise cts msb} since they have finitely many discontinuities. Therefore $\real(F) = f(\pi_y(x,y))g(x-y)\cos(kx)$ and $\imag(F) = f(\pi_y(x,y))g(x-y)\sin(kx)$ are $\curlyB_2 \to \curlyB$ measurable.
     \[|\real(F(x, y))|, |\imag(F(x, y))| \leq |F(x, y)| = |f(y)g(x-y)| \leq C < \infty\]
     since both $f$ and $g$ are bounded.
     \[\begin{aligned}
@@ -374,7 +390,7 @@ By extending the idea of the idea of the Theorem~\ref{FFT} we formulate the foll
             = 4\pi^2 C < \infty
         \end{aligned}\]
 
-    The same holds for $\imag(F)$. Since the function $F$ is absolutely integrable on ${[0, 2\pi]}^2$ we can use Fubini's theorem:
+    The same holds for $\imag(F)$. Since the function $F$ is absolutely integrable on ${[0, 2\pi]}^2$ we can use Fubini's theorem (which also ensures \eqref{eq:conv thm coef def} is well-defined):
     \[\begin{aligned}
             \int_{0}^{2\pi} \int_{0}^{2\pi} F(x,y) \dx{y} \dx{x}
              & = \\ \int_{0}^{2\pi} \int_{0}^{2\pi} \mathrm{Re}(F(x,y)) \dx{y} \dx{x}  + i \int_{0}^{2\pi} \int_{0}^{2\pi} \mathrm{Im}(F(x,y)) \dx{y} \dx{x}
@@ -439,7 +455,7 @@ By combining the terms together:
 This yields the following expression for $y_j$, when $j\neq 0$:
 \[y_{j}  = \frac{1}{\sqrt{N}} \frac{\omega_N^{-jk} - \omega_N^{jk}}{1 - \omega_N^{j}}\]
 
-If $j = 0$, then all the summands are equal to one, so get just $2k/N$. 
+If $j = 0$, then all the summands are equal to one, so get just $2k/N$.
 By the direct analogy to Theorem $\ref{thm:convolution theorem}$:
 \[\frac{1}{\sqrt N}(F(x\circledast y)) = Fx \odot Fy\]
 which allows to implement the low pass filter using its impulse response. That is the point, where theory meets the real world example and makes use of the abstract theorem. In general this concept can be generlaized to any signal, which can be used for example for reverb implementation if we have an impulse response of a room (a recording of echo induced by a short impact, for example a clap).
@@ -474,7 +490,7 @@ For small $x$ we have $\sin(x) \approx x$ and $\cos(x) \approx 1$, so whenever $
 \[
     \frac{\cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)} - i \sin\left(kx_j\right)
     \approx \frac{\sin(kx_j)}{x_j/2} - i\sin(kx_j)\]
-which becomes 
+which becomes
 \[\frac{1}{\sqrt{N}}  \left(\frac{2\sin(kx_j)}{x_j} - i \sin(kx_j)\right)\] after normalization.
 \begin{thebibliography}{8}
     \bibitem{fourier}
