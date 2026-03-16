@@ -153,17 +153,11 @@ We define the matrix $F_{kj} = \frac{1}{\sqrt N} \omega_N^{kj}$. Then:
 	y_j = \sqrt{N}{(Fz)}_j \Rightarrow
 	y = \sqrt{N}Fz \Rightarrow
 	z = \frac{1}{\sqrt{N}}F^{-1}y
+	= Ty
 	\label{eq:DFT unnormalized}
 \end{equation}
 
 Later we use the vector $z$ to indicate the output of the DFT, namely $F^{-1}y$
-
-The crucial observation is that the oscillation of the form $e^{i (k+nN)x}$ for $n>0$ and $k \in {0, ..., N-1}$ cannot be detected using the given discretized points. This simply follows from the fact that
-$e^{i (k+nN)x_j}
-	= e^{i (k+nN)\frac{j\cdot 2\pi}{N}}
-	= e^{i\frac{kj\cdot 2\pi}{N}}e^{2\pi i\cdot nj}
-	= e^{2\pi i\frac{kj}{N}}
-	= e^{ikx_j} $ as computed previously. Even though the original signal might have an oscillation with rate above $N$, we are unable to detect it using the discrete values of the function $f$, therefore we may just assume each $z_k$ corresponds to the coefficient $\hat{f}(k)$ (basically, contribution of the waves corresponding to the frequencies above $N$ cannot be distinguished from the wave with the respective frequency in the range from $0$ to $N-1$). In sound processing this doesn't pose any issue since human ear cannot hear any frequency above 20 khz, so with enough discretization we basically do not lose any perceivable data.
 
 \begin{theorem} \label{thm:DFT unitary}
 	The matrix $F_{kj} = \frac{1}{\sqrt N} \omega_N^{kj}$ is unitary
@@ -218,6 +212,100 @@ Using the result of Theorem~\ref{thm:DFT unitary} and equations \eqref{eq:DFT un
 	= \frac{1}{\sqrt{N}}\sum_{k =0}^{N-1} \omega_N^{kj} z_k
 	\label{eq:IDFT} \tag{IDFT}
 \end{equation}
+
+\begin{remark}
+	Now we make two remarks about the DFT structure:
+	\begin{enumerate}
+		\item Firstly using DFT of size $n$ we are unable to detect the frequencies above n-th one. In fact as the equation \eqref{eq:IDFT unnormalized} suggests, the frequency of the form $k+nN$ with $k\in {0, ..., N-1}$ contributes to the entry with index $k$. However the maximum frequency human ear can process is approximately $20000$, so this issue is handled by choosing an appropriate sample rate, that is usually 44000hz, which is double the maximum frequency which can be detected. The exact reason for it such choice is discussed later. The following plot illustrates the issue discussed (so-called aliasing):
+		      \begin{figure}[htbp]
+			      \centering
+			      \begin{tikzpicture}
+				      \draw[very thin,color=gray] (-0.1,-1.1) grid (7,1.1);
+
+				      \draw[->] (-0.2,0) -- (7.2,0) node[right] {$x$};
+				      \draw[->] (0,-1.2) -- (0,1.2) node[above] {$y$};
+
+				      \draw[color=red, domain=0:6.2831, samples = 20, smooth] plot (\x, {sin(20*\x r)}) node[above right] {\scriptsize $\sin(20x)$};
+
+				      \foreach \x in {0,...,20}
+				      \fill[color = red] (\x * 6.2831 / 20 ,{sin (\x / 20 * 6.2831 r)}) circle (0.05cm);
+			      \end{tikzpicture}
+
+			      \caption{20 discrete points}
+
+			      \begin{tikzpicture}
+				      \draw[very thin,color=gray] (-0.1,-1.1) grid (7,1.1);
+
+				      \draw[->] (-0.2,0) -- (7.2,0) node[right] {$x$};
+				      \draw[->] (0,-1.2) -- (0,1.2) node[above] {$y$};
+
+				      \draw[color=red, domain=0:6.2831, samples = 200, smooth] plot (\x, {sin(20*\x r)}) node[above right] {\scriptsize $\sin(20x)$};
+
+				      \foreach \x in {0,...,200}
+				      \fill[color = red] (\x * 6.2831 / 200, {sin (20 * \x / 200 * 6.2831 r)}) circle (0.02cm);
+			      \end{tikzpicture}
+
+			      \caption{200 discrete points}
+		      \end{figure}
+		\item The meaning of the phase is often overlooked in the literature, so we consider an example:
+		      Let $y = e_k + e_{N-k}$. Then
+		      \[\begin{aligned}
+				      Ty
+				      & = F^{-1}_{*k} + F^{-1}_{*(N-k)}
+				       =
+				      \begin{pmatrix}
+					      \omega_N^{0}  \\
+					      \omega_N^{-k} \\
+					      \vdots        \\
+					      \omega_N^{-k(N-1)}
+				      \end{pmatrix}
+				      + \begin{pmatrix}
+					        \omega_N^{0}      \\
+					        \omega_N^{-(N-k)} \\
+					        \vdots            \\
+					        \omega_N^{-(N-k)(N-1)}
+				        \end{pmatrix}
+				      \\ &\underset{\text{Lemma \ref{lm:roots of unity cyclicity}}}{=} \begin{pmatrix}
+					      \omega_N^{0} + \omega_N^{0}  \\
+					      \omega_N^{-k} + \omega_N^{k} \\
+					      \vdots                       \\
+					      \omega_N^{-k(N-1)} + \omega_N^{k(N-1)}
+				      \end{pmatrix}
+				      =
+				      \begin{pmatrix}
+					      2\cos(0)                           \\
+					      2\cos\left(\frac{2\pi k}{N}\right) \\
+					      \vdots                             \\
+					      2\cos\left(\frac{2\pi k(N-1)}{N}\right)
+				      \end{pmatrix}
+			      \end{aligned}\]
+		      As we see from the computation, the output is the function $\cos (kx)$ discretized at points $\frac{2\pi j}{N}$ for $j\in \{0, \dots, N-1\}$. What happens if we multiply the original vector $y$ by $\omega_N^k$?
+		      \[\begin{aligned}
+				      T(\omega_N^k y)
+				       & = \omega_N^k \begin{pmatrix}
+					                      \omega_N^{0} + \omega_N^{0}  \\
+					                      \omega_N^{-k} + \omega_N^{k} \\
+					                      \vdots                       \\
+					                      \omega_N^{-k(N-1)} + \omega_N^{k(N-1)}
+				                      \end{pmatrix}
+				      \\ & = \begin{pmatrix}
+					      \omega_N^{k} + \omega_N^{k}    \\
+					      \omega_N^{-2k} + \omega_N^{2k} \\
+					      \vdots                         \\
+					      \omega_N^{-kN} + \omega_N^{kN}
+				      \end{pmatrix} =
+				      \begin{pmatrix}
+					      2\cos\left(\frac{2\pi k}{N}\right)    \\
+					      2\cos\left(\frac{2\pi (2k)}{N}\right) \\
+					      \vdots                                \\
+					      2\cos\left(\frac{2\pi k(N)}{N}\right)
+				      \end{pmatrix}
+			      \end{aligned}\]
+			In this case the output is the function $\cos (kx)$ discretized at points $\frac{2\pi j}{N}$ for $j\in \{1, \dots, N\}$, or alternatively $\cos \left(k\left(x + \frac{2\pi}{N}\right)\right)$
+
+			not hard yet difficult to see by yourself (at least for me)
+	\end{enumerate}
+\end{remark}
 
 \begin{theorem}[Real signal conjugate symmetry] \label{thm: real signal symmetry}
 	Let $N$ be even. The following are equivalent:
