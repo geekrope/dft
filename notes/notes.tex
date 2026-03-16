@@ -559,7 +559,7 @@ By combining the terms together:
 This yields the following expression for $y_j$, when $j\neq 0$:
 \[y_{j}  = \frac{1}{\sqrt{N}} \left(\omega_N^{jk} + \frac{\omega_N^{-jk} - \omega_N^{jk}}{1 - \omega_N^{j}} \right)\]
 
-If $j = 0$, then all the summands are equal to one, so get just $2k/N$.
+If $j = 0$, then all the summands are equal to one, so get just $(2k+1)/N$.
 By the direct analogy to Theorem $\ref{thm:convolution theorem}$:
 \[\frac{1}{\sqrt N}(F(x\circledast y)) = Fx \odot Fy\]
 which allows to implement the low pass filter using its impulse response. That is the point, where theory meets the real world example and makes use of the abstract theorem. In general this concept can be generalaized to any signal, which can be used, for instance for reverb implementation if we have an impulse response of a room (a recording of echo induced by a short impact).
@@ -596,10 +596,16 @@ Add the term $\omega_N^{jk}$ we had previously:
 	\begin{aligned}
 		\omega_N^{jk} + \frac{\cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)} - i \sin(kx_j)
 		 & = \\ \cos(kx_j) + i \sin(kx_j) + \frac{\cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)} - i \sin(kx_j)
-		 & = \\ \cos(kx_j) + \frac{\cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)} = \frac{\cos(kx_j) \sin(x_j/2) + \cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)}
+		 & = \\ \cos(kx_j) + \frac{\cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)}
+		  = \frac{\cos(kx_j) \sin(x_j/2) + \cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)}
 	\end{aligned}
 	\label{eq:lpf before trig id}
 \end{equation}
+\[\eqref{eq:lpf before trig id} =\frac{\sin((k+1/2)x_j/2)}{\sin(x_j/2)}\]
+\[y_j = \begin{cases}
+	\frac{1}{\sqrt{N}}\frac{\sin((k+1/2)x_j/2)}{\sin(x_j/2)} \; \forall j\in {1, \dots, N-1} \\
+	(2k+1)/N, \; j = 0
+\end{cases}\]
 
 Miraculously we got a continuous Dirichlet kernel, discretized at points $x_j$. One can show, that the impulse response of Dirichlet kernel in continuous space acts in the exact same way, namely cuts the frequencies above the k-th one.
 
