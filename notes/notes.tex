@@ -216,7 +216,7 @@ Using the result of Theorem~\ref{thm:DFT unitary} and equations \eqref{eq:DFT un
 \begin{remark}
 	Now we make two remarks about the DFT structure:
 	\begin{enumerate}
-		\item Firstly using DFT of size $n$ we are unable to detect the frequencies above n-th one. In fact as the equation \eqref{eq:IDFT unnormalized} suggests, the frequency of the form $k+nN$ with $k\in {0, ..., N-1}$ contributes to the entry with index $k$. However the maximum frequency human ear can process is approximately $20000$, so this issue is handled by choosing an appropriate sample rate, that is usually 44000hz, which is double the maximum frequency which can be detected. The exact reason for it such choice is discussed later. The following plot illustrates the issue discussed (so-called aliasing):
+		\item Firstly using DFT of size $n$ we are unable to detect the frequencies above the (n-1)-th one. In fact as the equation \eqref{eq:IDFT unnormalized} suggests, the frequency of the form $k+nN$ with $k\in {0, ..., N-1}$ contributes to the entry with index $k$. However the maximum frequency human ear can process is approximately $20000$, so this issue is handled by choosing an appropriate sample rate, that is usually 44100hz, which is double the maximum frequency which can be detected. The exact reason for it such choice is discussed later. The following plot illustrates the issue discussed (so-called aliasing):
 		      \begin{figure}[htbp]
 			      \centering
 			      \begin{tikzpicture}
@@ -225,34 +225,48 @@ Using the result of Theorem~\ref{thm:DFT unitary} and equations \eqref{eq:DFT un
 				      \draw[->] (-0.2,0) -- (7.2,0) node[right] {$x$};
 				      \draw[->] (0,-1.2) -- (0,1.2) node[above] {$y$};
 
-				      \draw[color=red, domain=0:6.2831, samples = 20, smooth] plot (\x, {sin(20*\x r)}) node[above right] {\scriptsize $\sin(20x)$};
+				      \draw[color=red, domain=0:2*pi, samples = 20, smooth] plot (\x, {sin(20 * \x r)}) node[above right] {\scriptsize $\substack{\sin(20x) \\ \text{aliased}}$};
 
-				      \foreach \x in {0,...,20}
-				      \fill[color = red] (\x * 6.2831 / 20 ,{sin (\x / 20 * 6.2831 r)}) circle (0.05cm);
+				      \foreach \x in {0,...,19} % exaclty 20 point
+				      \fill[color = red] (\x * 2 * pi / 19 ,{sin (\x / 19 * 360)}) circle (0.02cm);
 			      \end{tikzpicture}
 
 			      \caption{20 discrete points}
 
 			      \begin{tikzpicture}
+				      \pgfmathsetmacro{\base}{20}
+				      \pgfmathsetmacro{\oversample}{15}
+				      \pgfmathsetmacro{\count}{(\base-1)*\oversample}
+
 				      \draw[very thin,color=gray] (-0.1,-1.1) grid (7,1.1);
 
 				      \draw[->] (-0.2,0) -- (7.2,0) node[right] {$x$};
 				      \draw[->] (0,-1.2) -- (0,1.2) node[above] {$y$};
 
-				      \draw[color=red, domain=0:6.2831, samples = 200, smooth] plot (\x, {sin(20*\x r)}) node[above right] {\scriptsize $\sin(20x)$};
+				      \draw[color=red, domain=0:2*pi + 0.001, samples = \count, smooth] plot (\x, {sin(20 * \x r)}) node[above right] {\scriptsize $\sin(20x)$};
 
-				      \foreach \x in {0,...,200}
-				      \fill[color = red] (\x * 6.2831 / 200, {sin (20 * \x / 200 * 6.2831 r)}) circle (0.02cm);
+				      \draw[color=black, domain=0:2*pi, samples = \count, smooth, draw opacity=0.5, dashed] plot (\x, {sin(\x r)}) node[below right] {\scriptsize $\sin(x)$};
+
+				      \foreach \x in {0,...,\count}
+					      {
+						      \pgfmathtruncatemacro{\remainder}{mod(\x, \oversample)}
+
+						      \ifnum\remainder=0  % highlight each point which was present before oversampling
+							      \fill[color=black] ({\x * 2 * pi / \count}, {sin(20 * \x / \count * 360)}) circle (0.02cm);
+						      \else
+							      \fill[color=red] ({\x * 2 * pi / \count}, {sin(20 * \x / \count * 360)}) circle (0.02cm);
+						      \fi
+					      }
 			      \end{tikzpicture}
 
-			      \caption{200 discrete points}
+			      \caption{286 discrete points}
 		      \end{figure}
 		\item The meaning of the phase is often overlooked in the literature, so we consider an example:
-		      Let $y = e_k + e_{N-k}$. Then
+		      Let $y = e_k + e_{N-k}$. Then:
 		      \[\begin{aligned}
 				      Ty
-				      & = F^{-1}_{*k} + F^{-1}_{*(N-k)}
-				       =
+				       & = T_{*k} + T_{*(N-k)}
+				      =
 				      \begin{pmatrix}
 					      \omega_N^{0}  \\
 					      \omega_N^{-k} \\
@@ -301,9 +315,9 @@ Using the result of Theorem~\ref{thm:DFT unitary} and equations \eqref{eq:DFT un
 					      2\cos\left(\frac{2\pi k(N)}{N}\right)
 				      \end{pmatrix}
 			      \end{aligned}\]
-			In this case the output is the function $\cos (kx)$ discretized at points $\frac{2\pi j}{N}$ for $j\in \{1, \dots, N\}$, or alternatively $\cos \left(k\left(x + \frac{2\pi}{N}\right)\right)$
+		      In this case the output is the function $\cos (kx)$ discretized at points $\frac{2\pi j}{N}$ for $j\in \{1, \dots, N\}$, or alternatively $\cos \left(k\left(x + \frac{2\pi}{N}\right)\right)$
 
-			not hard yet difficult to see by yourself (at least for me)
+		      not hard yet difficult to see by yourself (at least for me)
 	\end{enumerate}
 \end{remark}
 
