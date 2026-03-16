@@ -517,22 +517,24 @@ By extending the idea of the idea of the Theorem~\ref{FFT} we formulate the foll
 \end{proof}
 
 Using this knowledge we can derive an ideal low pass filter.
-\[z_i = \begin{cases} 0, \;i \in [k;n-k) \\ 1, \; \text{otherwise} \end{cases}\]
+\[z_i = \begin{cases} 0, \;i \in (k;n-k) \\ 1, \; \text{otherwise} \end{cases}\]
+
+This is an impulse reponse of the filter cutting all the frequencies above the k-th one. Recall that the $N-k$ element in DFT vector corresponds to the negative oscilation with the frequency $k$, due to cyclicity of $e^{\frac{2\pi i j x}{N}}$.
 
 Using the formula for \ref{eq:IDFT}:
 \[\begin{aligned}
 		y_{j} = \sum_{l=0}^{N-1} F_{jl} z_k
-		= \sum_{l=0}^{k-1} F_{jl} + \sum_{l=N-k}^{N-1} F_{jl}
-		= \frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k-1} \omega_N^{jl} + \sum_{l=N-k}^{N-1} \omega_N^{jl} \right)
+		= \sum_{l=0}^{k} F_{jl} + \sum_{l=N-k}^{N-1} F_{jl}
+		= \frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k} \omega_N^{jl} + \sum_{l=N-k}^{N-1} \omega_N^{jl} \right)
 	\end{aligned}\]
 
 Substitute $l = N-m-1$ in the second sum:
 \[\begin{aligned}
-		\frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k-1} \omega_N^{jl} + \sum_{l=N-k}^{N-1} \omega_N^{jl} \right) =
-		\frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k-1} \omega_N^{jl} + \sum_{m=0}^{k-1} \omega_N^{j(N-m-1)} \right)
-		 & =                                               \\ \frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k-1} \omega_N^{jl} + \sum_{m=0}^{k-1} \omega_N^{j(N-m-1)} \right)
-		=\frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k-1} \omega_N^{jl} + \sum_{m=0}^{k-1} \omega_N^{jN} \omega_N^{-j} \omega_N^{-jm} \right)
-		 & \underset{\ref{lm:roots of unity cyclicity}}{=} \\ \frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k-1} \omega_N^{jl} + \omega_N^{-j} \sum_{m=0}^{k-1} \omega_N^{-jm} \right)
+		\frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k} \omega_N^{jl} + \sum_{l=N-k}^{N-1} \omega_N^{jl} \right) =
+		\frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k} \omega_N^{jl} + \sum_{m=0}^{k-1} \omega_N^{j(N-m-1)} \right)
+		 & =                                               \\ \frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k} \omega_N^{jl} + \sum_{m=0}^{k-1} \omega_N^{j(N-m-1)} \right)
+		=\frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k} \omega_N^{jl} + \sum_{m=0}^{k-1} \omega_N^{jN} \omega_N^{-j} \omega_N^{-jm} \right)
+		 & \underset{\ref{lm:roots of unity cyclicity}}{=} \\ \frac{1}{\sqrt{N}} \left(\omega_N^{jk} + \sum_{l=0}^{k-1} \omega_N^{jl} + \omega_N^{-j} \sum_{m=0}^{k-1} \omega_N^{-jm} \right)
 	\end{aligned}\]
 
 Let $j\neq 0$. Using the sum of geometric series:
@@ -555,12 +557,12 @@ By combining the terms together:
 	= \frac{\omega^{-jk} - \omega^{jk}}{1 - \omega_N^{j}}\]
 
 This yields the following expression for $y_j$, when $j\neq 0$:
-\[y_{j}  = \frac{1}{\sqrt{N}} \frac{\omega_N^{-jk} - \omega_N^{jk}}{1 - \omega_N^{j}}\]
+\[y_{j}  = \frac{1}{\sqrt{N}} \left(\omega_N^{jk} + \frac{\omega_N^{-jk} - \omega_N^{jk}}{1 - \omega_N^{j}} \right)\]
 
 If $j = 0$, then all the summands are equal to one, so get just $2k/N$.
 By the direct analogy to Theorem $\ref{thm:convolution theorem}$:
 \[\frac{1}{\sqrt N}(F(x\circledast y)) = Fx \odot Fy\]
-which allows to implement the low pass filter using its impulse response. That is the point, where theory meets the real world example and makes use of the abstract theorem. In general this concept can be generlaized to any signal, which can be used for example for reverb implementation if we have an impulse response of a room (a recording of echo induced by a short impact, for example a clap).
+which allows to implement the low pass filter using its impulse response. That is the point, where theory meets the real world example and makes use of the abstract theorem. In general this concept can be generalaized to any signal, which can be used, for instance for reverb implementation if we have an impulse response of a room (a recording of echo induced by a short impact).
 
 Now we take a closer look on the expression we derive above:
 \[
@@ -588,12 +590,19 @@ With $x_j = 2\pi j / N$ we have:
 	\frac{e^{-\frac{\pi i\cdot j}{N}} \sin\left(\frac{2\pi kj}{N}\right)}{\sin \left(\frac{\pi j}{N}\right)}
 	= \frac{e^{-ix_j/2} \sin\left(kx_j\right)}{\sin \left(x_j/2\right)}
 	= \frac{\cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)} - i \sin\left(kx_j\right)\]
-For small $x$ we have $\sin(x) \approx x$ and $\cos(x) \approx 1$, so whenever $x_j$ is small enough we have the following estimate:
-\[
-	\frac{\cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)} - i \sin\left(kx_j\right)
-	\approx \frac{\sin(kx_j)}{x_j/2} - i\sin(kx_j)\]
-which becomes
-\[\frac{1}{\sqrt{N}}  \left(\frac{2\sin(kx_j)}{x_j} - i \sin(kx_j)\right)\] after normalization.
+
+Add the term $\omega_N^{jk}$ we had previously:
+\begin{equation}
+	\begin{aligned}
+		\omega_N^{jk} + \frac{\cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)} - i \sin(kx_j)
+		 & = \\ \cos(kx_j) + i \sin(kx_j) + \frac{\cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)} - i \sin(kx_j)
+		 & = \\ \cos(kx_j) + \frac{\cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)} = \frac{\cos(kx_j) \sin(x_j/2) + \cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)}
+	\end{aligned}
+	\label{eq:lpf before trig id}
+\end{equation}
+
+Miraculously we got a continuous Dirichlet kernel, discretized at points $x_j$. One can show, that the impulse response of Dirichlet kernel in continuous space acts in the exact same way, namely cuts the frequencies above the k-th one.
+
 \begin{thebibliography}{8}
 	\bibitem{fourier}
 	Elias M. Stein and Rami Shakarchi (2003) \emph{Fourier Analysis: An Introduction}
