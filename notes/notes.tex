@@ -215,7 +215,7 @@ Using the result of Theorem~\ref{thm:DFT unitary} and equations \eqref{eq:DFT un
 
 \begin{remark}
 	Now we make two remarks about the DFT structure:
-	\begin{enumerate}
+	\begin{enumerate}[label = \theremark.\arabic*]
 		\item Firstly using DFT of size $n$ we are unable to detect the frequencies above the (n-1)-th one. In fact as the equation \eqref{eq:IDFT unnormalized} suggests, the frequency of the form $k+nN$ with $k\in {0, ..., N-1}$ contributes to the entry with index $k$. However the maximum frequency human ear can process is approximately $20000$, so this issue is handled by choosing an appropriate sample rate, that is usually 44100hz, which is double the maximum frequency which can be detected. The exact reason for it such choice is discussed later. The following plot illustrates the issue discussed (so-called aliasing):
 		      \begin{figure}[htbp]
 			      \centering
@@ -293,29 +293,37 @@ Using the result of Theorem~\ref{thm:DFT unitary} and equations \eqref{eq:DFT un
 					      2\cos\left(\frac{2\pi k(N-1)}{N}\right)
 				      \end{pmatrix}
 			      \end{aligned}\]
-		      As we see from the computation, the output is the function $\cos (kx)$ discretized at points $\frac{2\pi j}{N}$ for $j\in \{0, \dots, N-1\}$. What happens if we multiply the original vector $y$ by $\omega_N^k$?
+		      As we see from the computation, the output is the function $\cos (kx)$ discretized at points $x_j=\frac{2\pi j}{N}$ for $j\in \{0, \dots, N-1\}$. What happens if we multiply the positive frequency component of $y$ by $\omega_N^{-k}$ and the negative one by $\omega_N^{k}$?
+		      \[y^* = \omega_N^{-k}e_k + (\omega_N^{k}e_{N-k})\]
 		      \[\begin{aligned}
-				      T(\omega_N^k y)
-				       & = \omega_N^k \begin{pmatrix}
-					                      \omega_N^{0} + \omega_N^{0}  \\
-					                      \omega_N^{-k} + \omega_N^{k} \\
-					                      \vdots                       \\
-					                      \omega_N^{-k(N-1)} + \omega_N^{k(N-1)}
-				                      \end{pmatrix}
+				      Ty^*
+				       & = \begin{pmatrix}
+					           \omega_N^{-k} \omega_N^{0} + \omega_N^k \omega_N^{0}  \\
+					           \omega_N^{-k} \omega_N^{-k} + \omega_N^k \omega_N^{k} \\
+					           \vdots                                                \\
+					           \omega_N^{-k} \omega_N^{-k(N-1)} + \omega_N^k \omega_N^{k(N-1)}
+				           \end{pmatrix}
 				      \\ & = \begin{pmatrix}
-					      \omega_N^{k} + \omega_N^{k}    \\
+					      \omega_N^{-k} + \omega_N^{k}   \\
 					      \omega_N^{-2k} + \omega_N^{2k} \\
 					      \vdots                         \\
 					      \omega_N^{-kN} + \omega_N^{kN}
 				      \end{pmatrix} =
 				      \begin{pmatrix}
-					      2\cos\left(\frac{2\pi k}{N}\right)    \\
-					      2\cos\left(\frac{2\pi (2k)}{N}\right) \\
-					      \vdots                                \\
-					      2\cos\left(\frac{2\pi k(N)}{N}\right)
+					      2\cos\left(\frac{2\pi k}{N}\right)        \\
+					      2\cos\left(\frac{2\pi \cdot 2k}{N}\right) \\
+					      2\cos\left(\frac{2\pi \cdot 3k}{N}\right) \\
+					      \vdots                                    \\
+					      2\cos\left(\frac{2\pi kN}{N}\right)
 				      \end{pmatrix}
 			      \end{aligned}\]
-		      In this case the output is the function $\cos (kx)$ discretized at points $\frac{2\pi j}{N}$ for $j\in \{1, \dots, N\}$, or alternatively $\cos \left(k\left(x + \frac{2\pi}{N}\right)\right)$
+		      We effectively moved the phase of the cosine by $\frac{2\pi}{N}$, since
+		      \[\begin{aligned}
+				      {(Ty^*)}_j
+				      &= 2\cos\left(\frac{2\pi k(j+1)}{N}\right)
+				      = 2\cos\left(k\left(\frac{2\pi j}{N} + \frac{2\pi}{N}\right)\right)
+				      \\ &= 2\cos\left(k\left(x_j + \frac{2\pi}{N}\right)\right)
+			      \end{aligned}\]
 
 		      not hard yet difficult to see by yourself (at least for me)
 	\end{enumerate}
@@ -482,7 +490,7 @@ By extending the idea of the idea of the Theorem~\ref{FFT} we formulate the foll
 		\end{aligned} \label{eq:conv thm coef def}
 	\end{equation}
 
-	Let $F(x,y) = f(y)g(x-y) e^{-ikx}$. We have that both $f, g$ are measurabe by Lemma~\ref{lm:piecewise cts msb} since they have finitely many discontinuities. Therefore $\real(F) = f(\pi_y(x,y))g(x-y)\cos(kx)$ and $\imag(F) = f(\pi_y(x,y))g(x-y)\sin(kx)$ are $\curlyB_2 \to \curlyB$ measurable.
+	Let $F(x,y) = f(y)g(x-y) e^{-ikx}$. We have that both $f, g$ are measurabe by Lemma~\ref{lm:piecewise cts msb} since they have finitely many discontinuities. Therefore $\real(F) = f(\pi_y(x,y))g(x-y)\cos(kx)$ and $\imag(F) = -f(\pi_y(x,y))g(x-y)\sin(kx)$ are $\curlyB_2 \to \curlyB$ measurable.
 	\[|\real(F(x, y))|, |\imag(F(x, y))| \leq |F(x, y)| = |f(y)g(x-y)| \leq C < \infty\]
 	since both $f$ and $g$ are bounded.
 	\[\begin{aligned}
@@ -492,7 +500,7 @@ By extending the idea of the idea of the Theorem~\ref{FFT} we formulate the foll
 			= 4\pi^2 C < \infty
 		\end{aligned}\]
 
-	The same holds for $\imag(F)$. Since the function $F$ is absolutely integrable on ${[0, 2\pi]}^2$ we can use Fubini's theorem (which also ensures \eqref{eq:conv thm coef def} is well-defined):
+	The same holds for $\imag(F)$. Since the function $F$ is absolutely integrable on ${[0, 2\pi]}^2$ we can use Fubini's theorem. This theorem also ensures, that $\int_{0}^{2\pi} f(y)g(x-y) e^{-ikx} \dx{y}$ is measurable wherever the integral exist. Moreover, we can say that the integral exists for all $y$, since the integrand is uniformly bounded.
 	\[\begin{aligned}
 			\int_{0}^{2\pi} \int_{0}^{2\pi} F(x,y) \dx{y} \dx{x}
 			 & = \\ \int_{0}^{2\pi} \int_{0}^{2\pi} \mathrm{Re}(F(x,y)) \dx{y} \dx{x}  + i \int_{0}^{2\pi} \int_{0}^{2\pi} \mathrm{Im}(F(x,y)) \dx{y} \dx{x}
@@ -502,7 +510,7 @@ By extending the idea of the idea of the Theorem~\ref{FFT} we formulate the foll
 			 & = \\ \int_{0}^{2\pi} f(y) e^{-iky} \int_{0}^{2\pi} g(x-y) e^{-ik(x-y)} \dx{x} \dx{y}
 		\end{aligned}\]
 
-	Do the substitution $t = x-y$, $\frac{\partial t}{\partial x} = 1$
+	Do the substitution $t = x-y$, $\frac{\partial t}{\partial x} = 1$ (this substitution is a diffeomorphism as a mapping $\Phi:[0;2\pi]\to [-y, 2\pi - y], \; x\mapsto x-y$ with $|\det(\Jac{\Phi(x)})| = 1$)
 	\[\begin{aligned}
 			\int_{0}^{2\pi} f(y) e^{-iky} \int_{0}^{2\pi} g(x-y) e^{-ik(x-y)} \dx{x} \dx{y}
 			 & = \\ \int_{0}^{2\pi} f(y) e^{-iky} \int_{-y}^{2\pi-y}g(t) e^{-ikt} \dx{t} \dx{y}
@@ -542,8 +550,8 @@ Let $j\neq 0$. Using the sum of geometric series:
 
 Similarly:
 \[\begin{aligned}
-		\omega_N^{-j}\sum_{l=0}^{k-1} \omega_N^{-jl}
-		= \omega_N^{-j}\sum_{l=0}^{k-1} {\left(\omega_N^{-j}\right)}^l
+		\omega_N^{-j}\sum_{m=0}^{k-1} \omega_N^{-jm}
+		= \omega_N^{-j}\sum_{m=0}^{k-1} {\left(\omega_N^{-j}\right)}^m
 		= \frac{\omega_N^{-j} - \omega_N^{-j}{\left(\omega_N^{-j}\right)}^k}{1 - \omega_N^{-j}}
 		 & = \\ \frac{\omega_N^{-j} - \omega_N^{-j}{\left(\omega_N^{-j}\right)}^k}{1 - \omega_N^{-j}} \frac{\omega_N^j}{\omega_N^j}
 		= \frac{1 - {\left(\omega_N^{-j}\right)}^k}{\omega_N^{j} - 1}
@@ -559,12 +567,12 @@ By combining the terms together:
 This yields the following expression for $y_j$, when $j\neq 0$:
 \[y_{j}  = \frac{1}{\sqrt{N}} \left(\omega_N^{jk} + \frac{\omega_N^{-jk} - \omega_N^{jk}}{1 - \omega_N^{j}} \right)\]
 
-If $j = 0$, then all the summands are equal to one, so get just $(2k+1)/N$.
+If $j = 0$, then all the summands are equal to one, so get just $(2k+1)/\sqrt{N}$.
 By the direct analogy to Theorem $\ref{thm:convolution theorem}$:
 \[\frac{1}{\sqrt N}(F(x\circledast y)) = Fx \odot Fy\]
-which allows to implement the low pass filter using its impulse response. That is the point, where theory meets the real world example and makes use of the abstract theorem. In general this concept can be generalaized to any signal, which can be used, for instance for reverb implementation if we have an impulse response of a room (a recording of echo induced by a short impact).
+which allows us to implement the low pass filter using its impulse response. That is the point, where theory meets the real world example and makes use of the abstract theorem. In general this concept can be generalaized to any signal, which can be used, for instance for reverb implementation if we have an impulse response of a room (a recording of echo induced by a short impact).
 
-Now we take a closer look on the expression we derive above:
+Now we take a closer look on the expression we had derived above:
 \[
 	e^{-ix}-e^{ix} = 2\imag(e^{-ix}) = 2i\sin(-x) = -2i\sin(x)\]
 \[
@@ -597,17 +605,22 @@ Add the term $\omega_N^{jk}$ we had previously:
 		\omega_N^{jk} + \frac{\cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)} - i \sin(kx_j)
 		 & = \\ \cos(kx_j) + i \sin(kx_j) + \frac{\cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)} - i \sin(kx_j)
 		 & = \\ \cos(kx_j) + \frac{\cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)}
-		  = \frac{\cos(kx_j) \sin(x_j/2) + \cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)}
+		 & = \\ \frac{\cos(kx_j) \sin(x_j/2) + \cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)}
 	\end{aligned}
 	\label{eq:lpf before trig id}
 \end{equation}
-\[\eqref{eq:lpf before trig id} =\frac{\sin((k+1/2)x_j/2)}{\sin(x_j/2)}\]
-\[y_j = \begin{cases}
-	\frac{1}{\sqrt{N}}\frac{\sin((k+1/2)x_j/2)}{\sin(x_j/2)} \; \forall j\in {1, \dots, N-1} \\
-	(2k+1)/N, \; j = 0
-\end{cases}\]
 
-Miraculously we got a continuous Dirichlet kernel, discretized at points $x_j$. One can show, that the impulse response of Dirichlet kernel in continuous space acts in the exact same way, namely cuts the frequencies above the k-th one.
+Using the equality $\sin(x+y) = \sin(x)\cos(y) + \sin(y)\cos(x)$:
+\[\eqref{eq:lpf before trig id} =\frac{\sin((k+1/2)x_j)}{\sin(x_j/2)}\]
+\[y_j = \begin{cases}
+		\frac{1}{\sqrt{N}}\frac{\sin((k+1/2)x_j)}{\sin(x_j/2)}, \;  j\in \{1, \dots, N-1\} \\
+		(2k+1)/\sqrt{N}, \; j = 0
+	\end{cases}\]
+
+Miraculously we got a continuous Dirichlet kernel, discretized at points $x_j$. One can show, that the impulse response of Dirichlet kernel in continuous space acts in the exact same way, namely cuts the frequencies above the k-th one. As we had seen in equation \eqref{eq:IDFT unnormalized}, $z_k = \sum_{n \in \Z} \hat{f}(k+nN)$, so given that $\widehat{D_n}(k) = \begin{cases}
+		1, k \leq n \\
+		0, \; \text{otherwise}
+	\end{cases}$, this result was not completely unexpected.
 
 \begin{thebibliography}{8}
 	\bibitem{fourier}
