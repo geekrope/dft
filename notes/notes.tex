@@ -7,6 +7,7 @@
 \usepackage{dsfont}
 \usepackage{hyperref}
 \usepackage{cleveref}
+\usepackage{fontawesome5}
 \usetikzlibrary{patterns.meta}
 
 \title{Digital signal processing}
@@ -19,7 +20,7 @@
 
 \begin{document}
 
-\newcommand{\todo}[1]{\begingroup \color{red} #1 \endgroup}
+\newcommand{\todo}[1]{\begingroup \color{red} #1\endgroup}
 
 %common sets%
 \newcommand{\R}{\mathbb{R}}
@@ -47,6 +48,8 @@
 %other%
 \newcommand{\ind}{\mathds{1}}
 \newcommand{\dx}[1]{\, \mathrm{d}#1}
+\newcommand{\ztransform}{\overset{\mathcal{Z}}{\leftrightarrow}}
+\newcommand{\iztransform}{\overset{\mathcal{Z}^{-1}}{\leftrightarrow}}
 
 %blocks%
 \newtheorem{theorem}{Theorem}[section]
@@ -536,6 +539,7 @@ By extending the idea of the idea of the Theorem~\ref{FFT} we formulate the foll
 	This is the direct analogy to the continuous case in Theorem~\ref{thm:convolution theorem}
 \end{proof}
 
+\newpage
 \subsection{Ideal LPF}\label{sec:ideal lpf}
 Using this knowledge we can derive an ideal low pass filter.
 \[z_i = \begin{cases} 0, \;i \in (k;n-k) \\ 1, \; \text{otherwise} \end{cases}\]
@@ -674,7 +678,7 @@ We kick off with the example
 
 	As in the case of Ideal low pass filter in Section~\ref{sec:ideal lpf} we got an impulse response of the filter introduced above. The only difference is that this filter has an impulse response with the size proportional to the sample size. That said the IR size grows infinitely in time unlike the IR of an ideal LPF, which has the same size for each frame.
 
-	We make an assumption on $x$, that is absolutely convergent. That is
+	We make an assumption on $x$, that its series is absolutely convergent. That is
 	\[\sum_{n=0}^{\infty} |x[n]| < \infty\]
 
 	Then for $n>m$ we have the following estimate for $0< \alpha < 1$:
@@ -687,43 +691,196 @@ We kick off with the example
 
 	Since the sum $\sum_{n=0}^{\infty} |x[n]|$ converges we have that $x_n$ is the zero sequence, hence for any $\varepsilon>0$ exists $n_0$, s.t. $|x_n| < \varepsilon \; \forall n \geq n_0$:
 	\[\begin{aligned}
-	\left|\sum_{j=0}^{m} (\alpha^{n-j} - \alpha^{m-j}) x[j]\right|
-	\leq \sum_{j=0}^{m} |\alpha^{n-j} - \alpha^{m-j}| \cdot |x[j]|
-	&=\\ \sum_{j=0}^{n_0} |\alpha^{n-j} - \alpha^{m-j}| \cdot |x[j]| + \sum_{j=n_0}^{m} |\alpha^{n-j} - \alpha^{m-j}| \cdot |x[j]| 
-	&\leq\\ \sum_{j=0}^{n_0} |\alpha^{n-j} - \alpha^{m-j}| \cdot |x[j]| + \varepsilon \sum_{j=n_0}^{m} |\alpha^{n-j} - \alpha^{m-j}|
-	\end{aligned}\]
+			\left|\sum_{j=0}^{m} (\alpha^{n-j} - \alpha^{m-j}) x[j]\right|
+			\leq \sum_{j=0}^{m} |\alpha^{n-j} - \alpha^{m-j}| \cdot |x[j]|
+			 & =    \\ \sum_{j=0}^{n_0} |\alpha^{n-j} - \alpha^{m-j}| \cdot |x[j]| + \sum_{j=n_0}^{m} |\alpha^{n-j} - \alpha^{m-j}| \cdot |x[j]|
+			 & \leq \\ \sum_{j=0}^{n_0} |\alpha^{n-j} - \alpha^{m-j}| \cdot |x[j]| + \varepsilon \sum_{j=n_0}^{m} |\alpha^{n-j} - \alpha^{m-j}|
+		\end{aligned}\]
 
 	With the assumption that $n > m$ we have $n - j > m - j$, so by the monotonicty of $\alpha^x$ we have that $\alpha^{n-j}< \alpha^{m-j} \Rightarrow |\alpha^{n-j} - \alpha^{m-j}| = \alpha^{m-j} - \alpha^{n-j} \leq \alpha^{m-j}$. Moreover $\sum_{j=n_0}^{m} \alpha^{m-j} \leq \sum_{j=0}^{\infty} \alpha^{j} = C \leq \infty$ since $m-j$ stays positive on the entire range of summation. For the same exact reason $|\alpha^{n-j} - \alpha^{m-j}| = \alpha^{m-j} - \alpha^{n-j} \leq \alpha^{m-n_0}$ if $j\leq n_0$. By combining those two estimates together:
 	\[\begin{aligned}
-	 \sum_{j=0}^{n_0} |\alpha^{n-j} - \alpha^{m-j}| \cdot |x[j]| + \varepsilon \sum_{j=n_0}^{m} |\alpha^{n-j} - \alpha^{m-j}|
-	 &\leq\\ \alpha^{m-n_0} \sum_{j=0}^{n_0} |x[j]| + C \varepsilon = \alpha^{m-n_0} M + C \varepsilon \rightarrow 0
-	\end{aligned}\]
+			\sum_{j=0}^{n_0} |\alpha^{n-j} - \alpha^{m-j}| \cdot |x[j]| + \varepsilon \sum_{j=n_0}^{m} |\alpha^{n-j} - \alpha^{m-j}|
+			 & \leq \\ \alpha^{m-n_0} \sum_{j=0}^{n_0} |x[j]| + C \varepsilon = \alpha^{m-n_0} M + C \varepsilon \rightarrow 0
+		\end{aligned}\]
 	as we can choose such $m$, that $\alpha^{m-n_0} M < \varepsilon$, so the whole expression is bounded by $(C+1)\varepsilon$
 
 	For the second term we have that:
-	\[\left|\sum_{j=m+1}^{n} \alpha^{n-j} x[j]\right| 
-	\leq \sum_{j=m+1}^{n} |\alpha^{n-j}| |x[j]| 
-	\leq \sum_{j=m+1}^{n} |x[j]|\]
+	\[\left|\sum_{j=m+1}^{n} \alpha^{n-j} x[j]\right|
+		\leq \sum_{j=m+1}^{n} |\alpha^{n-j}| |x[j]|
+		\leq \sum_{j=m+1}^{n} |x[j]|\]
 	which can be made arbitrarily small as the tail sum of a convergent sequence.
 
 	This proves for that sufficiently large $m$ we can get $|y[n] - y[m]|$ arbitrarily small, so $y[n]$ is a Cauchy sequence and hence converges.
 \end{example}
 
-\begin{lemma}
-	Let the series $\sum_{n=0}^{\infty} |x[n]|, \; x[n] \in \C$ be absolutely convergent. Then $\sum_{n=0}^{\infty} |x[n]z^n| < \infty$ for all $z$ with $|z|\leq 1$
+Observe that the way we proved the filter output to be absolutely summable became really tedious despite the simplicty of its definition. That motivates us develop the set of tools to analyze such filters relatively easy.
+
+\newpage
+\subsection{Stability}
+Let us consider the general form of the filters we would like to analyze:
+\begin{equation}
+	y[n] = \sum_{i=0}^{N} b_i x[n - i] + \sum_{i=1}^{M} a_i y[n - i] \label{eq:IIR def}
+\end{equation}
+
+\begin{lemma}[Z-transform properties]
+	Let $x \ztransform X(z)$ and $y \ztransform Y(z)$. The following holds:
+	\begin{enumerate}
+		\item \label{lm:z time shift} $x[n-k] \ztransform z^{-k}X(z)$
+		\item \label{lm:z linearity} $\alpha x[n] + \beta y[n] \ztransform \alpha X(z) + \beta Y(z)$
+	\end{enumerate}
 \end{lemma}
-\begin{proof}
-	This directly follows from the comparison principle. Define:
-	\[a_n = |x[n]| \in \R \quad b_n = |x[n]z^n| \in \R\]
-	We have that the sequence $b_n$ is bounded by $a_n$ since 
-	$|b_n| = |x[n]z^n| = |x[n]||z^n| \leq |x[n]| = a_n$, so using the fact that the series $\sum_{n=0}^{\infty} a_n$ is convergent, we conclude that $\sum_{n=0}^{\infty} b_n$ is convergent as well.
-	
-	By triangle inequality:
-	\[\left|\sum_{n=0}^{\infty} x[n]z^n \right| 
-	\leq \sum_{n=0}^{\infty} |x[n]z^n| 
-	< \infty\]
+\begin{proof} \hfill
+	\begin{enumerate}
+		\item
+		      \begin{align*}
+			      \sum_{n=-\infty}^{\infty} x[n-k] z^{-n}
+			       & = \sum_{m=-\infty}^{\infty} x[m] z^{-(m+k)}
+			      \\ &= z^{-k} \sum_{m=-\infty}^{\infty} x[m] z^{-m}
+			      \\ &= z^{-k} X(z)
+		      \end{align*}
+		\item We assume that both $X(z)$ and $Y(z)$ converge for the given value of $z$
+		      \begin{align*}
+			      \sum_{n=-\infty}^{\infty} (\alpha x[n] + \beta y[n])z^{-n}
+			       & = \sum_{n=-\infty}^{\infty} \alpha x[n] z^{-n} + \beta y[n] z^{-n}
+			      \\ &= \alpha \sum_{n=-\infty}^{\infty} x[n] z^{-n} + \beta \sum_{n=-\infty}^{\infty} y[n] z^{-n}
+			      \\ &= \alpha X(z) + \beta Y(z)
+		      \end{align*}
+	\end{enumerate}
 \end{proof}
 
+Taking the Z-transform of \eqref{eq:IIR def}:
+\[
+	y[n] \ztransform \sum_{i=0}^{N} b_i z^{-i} X(z) + \sum_{i=1}^{M} b_i z^{-i} Y(z)\]
+
+That is:
+\[Y(z) = \sum_{i=0}^{N} b_i z^{-i} X(z) + \sum_{i=1}^{M} a_i z^{-i} Y(z)\]
+\[Y(z) (1 - \sum_{i=1}^{M} b_i z^{-i}) = X(z)\sum_{i=0}^{N} a_i z^{-i}\]
+\begin{equation}
+	H(z) = \frac{Y(z)}{X(z)} = \frac{\sum_{i=0}^{N} b_i z^{-i}}{1 - \sum_{i=1}^{M} a_i z^{-i}} \label{eq:transfer func}
+\end{equation}
+
+This is called a transfer function and it is crucial for analyzing the filter's behaviour. Recall the definition of \ref{eq:DFT}:
+\[z_k 
+= \frac{1}{\sqrt{N}}\sum_{k =0}^{N-1} \omega_N^{-kj} y_k
+= \frac{1}{\sqrt{N}}\sum_{k =0}^{N-1} {\left(e^{\frac{2\pi i j}{N}}\right)}^{-k} y_k\]
+
+Now we denote $z = e^{\frac{2\pi i j}{N}}$ and drop the normalization factor in front. The expression becomes:
+\[\sum_{k =0}^{N-1} z^{-k} y_k\]
+is exactly the Z-transform of the signal $y$ (embedded into the infinite sequence). In general as $N$ gets large we may assume that for any $\omega \in [0, 2\pi]$ exists $j\in \N$ such that $\frac{2\pi j}{N} \approx \omega$, which allows us to compute the presence of any frequency in the range $[0, 2\pi]$ by evaluating the signal Z-transform at a point $z = e^{i\omega}$. Moreover the Theorem~\ref{thm:discrete convolution theorem} suggests that the function $H(z)$ represents an impulse response as it essentially does deconvolution in the frequency (z) domain.
+
+\begin{lemma}[Partial fraction expansion] \label{lm:partial fraction}
+	Let $P(x) \in \C_M[x]$, $a_i \in \C$ for $i \in \{1, \dots, N\}$ and $M<N$
+	\[Q(x) = \frac{P(x)}{\prod_{k=1}^{N} (1-a_kx)}\]
+	with $a_i \neq a_j \;\forall i\neq j$ and $a_i \neq 0$.
+
+	Then the function $Q(x)$ can be expressed in the following form:
+	\[Q(x) = \sum_{i=1}^{N} \frac{A_i}{(1-a_i x)}\]
+	and moreover this representation is unique.
+\end{lemma}
+\begin{proof}
+	Let $Q_i(x) = \prod_{k\neq i}^{N} (1-a_kx)$. Consider their linear combination:
+	\[\sum_{i=1}^{N} \lambda_i Q_i(x) = 0\]
+	Substitute $a_j^{-1}$, which is well defined since $a_j \neq 0 \; \forall j\in \N$. We observe that $Q_i(a_j^{-1}) = 0$ for $i\neq j$ since $Q_i$ contains the term $(1-a_jx)$. Also $a_ia_j^{-1} \neq 1 \; \forall i\neq j$ since $a_i \neq a_j$, so $Q_j(a_j^{-1}) \neq 0$. Then:
+	\[\sum_{i=1}^{N} \lambda_i Q_i(a_j^{-1}) = \lambda_j Q_j(a_j^{-1}) = 0\]
+
+	Since the field $(\C, +, \cdot)$ is zero divisor free we must have $\lambda_j = 0$. This holds for all $j\in \{1, \dots, N\}$.
+
+	Thus $Q_i$'s form the basis of $\C_{N-1}[x]$ as $\dim \C_{N-1}[x] = N$, hence in particular we can decompose every polynomial in $\C_{M}[x]$ using the linear combination of $Q_i$:
+	\begin{align*}
+		\frac{P(x)}{\prod_{k=1}^{N} (1-a_kx)}
+		= \frac{\sum_{i=1}^{N} A_i Q_i}{\prod_{k=1}^{N} (1-a_kx)}
+		= \sum_{i=1}^{N} \frac{A_i Q_i}{\prod_{k=1}^{N} (1-a_kx)}
+		= \sum_{i=1}^{N} \frac{A_i}{1-a_ix}
+	\end{align*}
+	Thus we proved the existence of partial fraction decomposition whenever the numerator degree is less than the degree of denominator and denominator does not contain zero roots. Uniqueness follows from the basis properties.
+\end{proof}
+\todo{}
+
+\newpage
+\subsection{Notch filter}
+We want to construct the transfer function with the zeros corresponding to the frequency $\omega$. Its numerator then is the function $(z^{-1} - e^{i\omega})(z^{-1} - e^{-i\omega})$ since we need to cancel both positive and negative frequency oscilations. Its plot looks as follows:
+
+[\todo{PLOT}]
+
+As we can see from the [\todo{figure}] this filter produces a significant uneveness in the spectrum. To mitigate this we divide the transfer function we got previously by $(rz^{-1} - e^{i\omega})(rz^{-1} - e^{-i\omega})$. This helps to flatten the filter since $rz^{-1} - e^{i\omega} \approx (z^{-1} - e^{i\omega})$ for $r$ reasonably close to 1. Note that dividing the transfer function by this expression adds two poles at $d_1 = re^{-i\omega}$ and $d_2 = re^{i\omega}$, so for the filter to be stable (converge for the unit circle) the radius $r$ must be less that 1. The bigger the value of $r$, the closer the pole is to the zeros, so it makes the filter steeper as it "lifts" the surface around it.
+\begin{align*}
+	H(z)
+	 & = \frac{(z^{-1} - e^{i\omega})(z^{-1} - e^{-i\omega})}{(rz^{-1} - e^{i\omega})(rz^{-1} - e^{-i\omega})}
+	= \frac{z^{-2} - (e^{-i\omega} + e^{i\omega})z^{-1} + 1}{r^2z^{-2} - r(e^{-i\omega} + e^{i\omega})z^{-1} + 1}
+\end{align*}
+
+\newpage
+\subsection{Absolutely unnecessary \faTrash}
+We perform the long division of the numerator and denominator:
+\begin{align*}
+	z^{-2} - (e^{-i\omega} + e^{i\omega})z^{-1} + 1
+	= \frac{1}{r^2}(r^2z^{-2} - r(e^{-i\omega} + e^{i\omega})z^{-1} + 1) & \,+ \\ \frac{(e^{-i\omega} + e^{i\omega})z^{-1}}{r} - \frac{1}{r^2} - (e^{-i\omega} + e^{i\omega})z^{-1} + 1
+\end{align*}
+so the transfer function becomes:
+\begin{align*}
+	H(z)
+	 & = \frac{1}{r^2} + \frac{\frac{(e^{-i\omega} + e^{i\omega})z^{-1}}{r} - \frac{1}{r^2} - (e^{-i\omega} + e^{i\omega})z^{-1} + 1}{r^2z^{-2} - r(e^{-i\omega} + e^{i\omega})z^{-1} + 1}
+	\\ &= \frac{1}{r^2} + \frac{(e^{-i\omega} + e^{i\omega})\left(\frac{1}{r} - 1\right)z^{-1} - \frac{1}{r^2} + 1}{(rz^{-1} - e^{i\omega})(rz^{-1} - e^{-i\omega})}
+\end{align*}
+
+Using the partial fraction expansion discussed in Lemma~\ref{lm:partial fraction}:
+\begin{align*}
+	H(z)
+	 & = \frac{1}{r^2} + \frac{A}{rz^{-1} - e^{i\omega}} + \frac{B}{rz^{-1} - e^{-i\omega}}
+	\\ &= \frac{1}{r^2} + \frac{A(rz^{-1} - e^{-i\omega}) + B(rz^{-1} - e^{i\omega})}{(rz^{-1} - e^{i\omega})(rz^{-1} - e^{-i\omega})}
+\end{align*}
+
+We get the following equation:
+\[
+	A(rz^{-1} - e^{-i\omega}) + B(rz^{-1} - e^{i\omega})
+	= (e^{-i\omega} + e^{i\omega})\left(\frac{1}{r} - 1\right)z^{-1} - \frac{1}{r^2} + 1\]
+\[
+	r(A+B)z^{-1} - (Ae^{-i\omega} + Be^{i\omega})
+	= (e^{-i\omega} + e^{i\omega})\left(\frac{1}{r} - 1\right)z^{-1} - \frac{1}{r^2} + 1\]
+
+Which result in the system of equation:
+\[\begin{cases}
+		r(A+B) = (e^{-i\omega} + e^{i\omega})\left(\frac{1}{r} - 1\right) \\
+		Ae^{-i\omega} + Be^{i\omega} = 1 - \frac{1}{r^2}
+	\end{cases}\]
+\[
+	B = (e^{-i\omega} + e^{i\omega})\left(\frac{1}{r^2} - \frac{1}{r}\right) - A\]
+\begin{align*}
+	Ae^{-i\omega} + Be^{i\omega}
+	 & = Ae^{-i\omega} +  \left((e^{-i\omega} + e^{i\omega})\left(\frac{1}{r^2} - \frac{1}{r}\right) - A\right)e^{i\omega}
+	\\ &= A(e^{-i\omega} - e^{i\omega}) + (1 + e^{2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right)
+\end{align*}
+\[
+	A(e^{-i\omega} - e^{i\omega}) + (1 + e^{2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right) = 1 - \frac{1}{r^2} \]
+\[
+	A(e^{-i\omega} - e^{i\omega}) = 1 - \frac{1}{r^2} - (1 + e^{2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right)\]
+\[
+	A
+	= \frac{1 - \frac{1}{r^2} - (1 + e^{2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right)}{e^{-i\omega} - e^{i\omega}}
+	= \frac{1 - \frac{1}{r^2} - (1 + e^{2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right)}{e^{-i\omega} - e^{i\omega}} \]
+\begin{align*}
+	B
+	 & = (e^{-i\omega} + e^{i\omega})\left(\frac{1}{r^2} - \frac{1}{r}\right) - \frac{1 - \frac{1}{r^2} - (1 + e^{2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right)}{e^{-i\omega} - e^{i\omega}}
+	\\ &= \frac{(e^{-2i\omega} - e^{2i\omega})\left(\frac{1}{r^2} - \frac{1}{r}\right)}{e^{-i\omega} - e^{i\omega}} - \frac{1 - \frac{1}{r^2} - (1 + e^{2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right)}{e^{-i\omega} - e^{i\omega}}
+	\\ &= \frac{1 - \frac{1}{r^2} + (1 + e^{-2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right)}{e^{-i\omega} - e^{i\omega}}
+\end{align*}
+
+\begin{center}
+	\framebox{
+		$A = \frac{1 - \frac{1}{r^2} - (1 + e^{2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right)}{e^{-i\omega} - e^{i\omega}} \quad B = \frac{1 - \frac{1}{r^2} + (1 + e^{-2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right)}{e^{-i\omega} - e^{i\omega}}$}
+\end{center}
+
+Now we are able to compute the inverse transform using the fact that
+\[a^n u[n] \ztransform \frac{1}{1-az^{-1}}\]
+\[\delta[n] \ztransform 1\]
+\begin{align*}
+	H(Z)
+	 & = \frac{1}{r^2} + \frac{Ae^{-i\omega}}{re^{-i\omega}z^{-1} - 1} + \frac{Be^{i\omega}}{re^{i\omega}z^{-1} - 1}
+	\\ & \iztransform \frac{1}{r^2}
+	\delta[n] - Ar^ne^{-i\omega(n+1)}u[n] - Br^ne^{i\omega(n+1)}u[n]
+\end{align*}
+
+\newpage
 \begin{thebibliography}{8}
 	\bibitem{fourier}
 	Elias M. Stein and Rami Shakarchi (2003) \emph{Fourier Analysis: An Introduction}
