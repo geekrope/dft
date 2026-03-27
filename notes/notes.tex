@@ -10,6 +10,14 @@
 \usepackage{fontawesome5}
 \usetikzlibrary{patterns.meta}
 
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,      % Color for internal links (sections, etc.)
+    citecolor=green,     % Color for bibliographical citations
+    filecolor=magenta,   % Color for file links
+    urlcolor=cyan        % Color for external hyperlinks
+}
+
 \title{Digital signal processing}
 \author{}
 
@@ -267,7 +275,7 @@ Using the result of Theorem~\ref{thm:DFT unitary} and equations \eqref{eq:DFT un
 
 			      \caption{286 discrete points}
 		      \end{figure}
-		\item The meaning of the phase is often overlooked in the literature, so we consider an example:
+		\item \label{ex:phase shift} The meaning of the phase is often overlooked in the literature, so we consider an example:
 		      Let $y = e_k + e_{N-k}$. Then:
 		      \[\begin{aligned}
 				      Ty
@@ -529,7 +537,7 @@ By extending the idea of the idea of the Theorem~\ref{FFT} we formulate the foll
 		= \hat{g}(k) \hat{f}(k)\]
 \end{proof}
 
-\begin{theorem}[Convolution theorem] \label{thm:discrete convolution theorem}
+\begin{theorem}[Discrete convolution theorem] \label{thm:discrete convolution theorem}
 	Let $x, y \in \R^n$. Then the following holds:
 
 	\[\frac{1}{\sqrt N}(F(x\circledast y)) = Fx \odot Fy\]
@@ -544,7 +552,7 @@ By extending the idea of the idea of the Theorem~\ref{FFT} we formulate the foll
 Using this knowledge we can derive an ideal low pass filter.
 \[z_i = \begin{cases} 0, \;i \in (k;n-k) \\ 1, \; \text{otherwise} \end{cases}\]
 
-This is an impulse reponse of the filter cutting all the frequencies above the k-th one. Recall that the $N-k$ element in DFT vector corresponds to the negative oscilation with the frequency $k$, due to cyclicity of $e^{\frac{2\pi i j x}{N}}$.
+This is an impulse reponse of the filter cutting all the frequencies above the k-th one. Recall that the $N-k$ element in DFT vector corresponds to the negative oscillation with the frequency $k$, due to cyclicity of $e^{\frac{2\pi i j x}{N}}$.
 
 Using the formula for \ref{eq:IDFT}:
 \[\begin{aligned}
@@ -642,7 +650,7 @@ Miraculously we got a continuous Dirichlet kernel, discretized at points $x_j$. 
 \newpage
 \section{Infinite impulse response filters}
 We kick off with the example
-\begin{example}
+\begin{example} \label{ex:feedback filter}
 	Consider the sequence $x[n] \in \R$, which represents the signal evolving in time. Let:
 	\begin{equation*}
 		y[0] = x[0], \quad y[n] = x[n] + \alpha y[n-1] \; \forall n > 0
@@ -713,6 +721,8 @@ We kick off with the example
 	This proves for that sufficiently large $m$ we can get $|y[n] - y[m]|$ arbitrarily small, so $y[n]$ is a Cauchy sequence and hence converges.
 \end{example}
 
+\todo{FIX THIS ENTIRELY}
+
 Observe that the way we proved the filter output to be absolutely summable became really tedious despite the simplicty of its definition. That motivates us develop the set of tools to analyze such filters relatively easy.
 
 \newpage
@@ -724,7 +734,7 @@ Let us consider the general form of the filters we would like to analyze:
 
 \begin{lemma}[Z-transform properties]
 	Let $x \ztransform X(z)$ and $y \ztransform Y(z)$. The following holds:
-	\begin{enumerate}
+	\begin{enumerate}[label=\thelemma.\arabic*]
 		\item \label{lm:z time shift} $x[n-k] \ztransform z^{-k}X(z)$
 		\item \label{lm:z linearity} $\alpha x[n] + \beta y[n] \ztransform \alpha X(z) + \beta Y(z)$
 	\end{enumerate}
@@ -750,19 +760,17 @@ Let us consider the general form of the filters we would like to analyze:
 
 Taking the Z-transform of \eqref{eq:IIR def}:
 \[
-	y[n] \ztransform \sum_{i=0}^{N} b_i z^{-i} X(z) + \sum_{i=1}^{M} b_i z^{-i} Y(z)\]
+	y[n] \ztransform \sum_{i=0}^{N} b_i z^{-i} X(z) + \sum_{i=1}^{M} a_i z^{-i} Y(z)\]
 
 That is:
 \[Y(z) = \sum_{i=0}^{N} b_i z^{-i} X(z) + \sum_{i=1}^{M} a_i z^{-i} Y(z)\]
-\[Y(z) (1 - \sum_{i=1}^{M} b_i z^{-i}) = X(z)\sum_{i=0}^{N} a_i z^{-i}\]
-\begin{equation}
-	H(z) = \frac{Y(z)}{X(z)} = \frac{\sum_{i=0}^{N} b_i z^{-i}}{1 - \sum_{i=1}^{M} a_i z^{-i}} \label{eq:transfer func}
-\end{equation}
+\[Y(z) - \sum_{i=1}^{M} a_i z^{-i} Y(z) = \sum_{i=0}^{N} b_i z^{-i} X(z)\]
+\[\frac{Y(z)}{X(z)} = \frac{\sum_{i=0}^{N} b_i z^{-i}}{1 - \sum_{i=1}^{M} a_i z^{-i}}\]
 
 This is called a transfer function and it is crucial for analyzing the filter's behaviour. Recall the definition of \ref{eq:DFT}:
-\[z_k 
-= \frac{1}{\sqrt{N}}\sum_{k =0}^{N-1} \omega_N^{-kj} y_k
-= \frac{1}{\sqrt{N}}\sum_{k =0}^{N-1} {\left(e^{\frac{2\pi i j}{N}}\right)}^{-k} y_k\]
+\[z_k
+	= \frac{1}{\sqrt{N}}\sum_{k =0}^{N-1} \omega_N^{-kj} y_k
+	= \frac{1}{\sqrt{N}}\sum_{k =0}^{N-1} {\left(e^{\frac{2\pi i j}{N}}\right)}^{-k} y_k\]
 
 Now we denote $z = e^{\frac{2\pi i j}{N}}$ and drop the normalization factor in front. The expression becomes:
 \[\sum_{k =0}^{N-1} z^{-k} y_k\]
@@ -794,23 +802,153 @@ is exactly the Z-transform of the signal $y$ (embedded into the infinite sequenc
 	\end{align*}
 	Thus we proved the existence of partial fraction decomposition whenever the numerator degree is less than the degree of denominator and denominator does not contain zero roots. Uniqueness follows from the basis properties.
 \end{proof}
-\todo{}
+
+\begin{lemma}[Long division] \label{lm:long div}
+	Let $P \in C_N[x]$ and $Q \in C_M[x]$ with $N \geq M > 0$ and $\deg P = N$, $\deg Q = M$. Then there exists a polynomial $q \in C_{N-M}[x]$ and $r \in C_{M-1}[x]$, s.t. $P = q\cdot Q + r$
+\end{lemma}
+\begin{proof}
+	Let $P(x) = a_{N}x^N + \dots + a_1x + a_0$ and $Q(x) = b_{M}x^M + \dots + b_1x + b_0$ with $a_N \neq 0$ and $b_M \neq 0$ to ensure that polynomials have the proper degree.
+	We prove this statement by induction:
+	\begin{enumerate}
+		\item[Base:] Let $N = M$. Set $q(x) = a_N / b_M$ and $r(x) = P(x) - q(x)\cdot Q(x)$.T his fraction is well defined since $b_M \neq 0$. $P = q\cdot Q + r$ follows by construction, so we need to show that $\deg r(x) \leq M$:
+		      \begin{align*}
+			      r(x) = a_{N}x^N + \dots + a_1x + a_0 - \frac{a_N}{b_M} (b_{M}x^M + \dots + b_1x + b_0)
+			       & =                 \\ a_{N}x^N + \dots + a_1x + a_0 - a_N x^M - \frac{a_N b_{M -1}}{b_M}x^{M-1} - \dots - \frac{a_N b_0}{b_M}
+			       & \underset{N=M}{=} \\ a_{N}x^N + \dots + a_1x + a_0 - a_N x^N - \frac{a_N b_{N -1}}{b_N}x^{N-1} - \dots - \frac{a_N b_0}{b_N}
+			       & =                 \\ a_{M-1}x^{M-1} + \dots + a_1x + a_0 - \frac{a_M b_{M -1}}{b_N}x^{M-1} - \dots - \frac{a_M b_0}{b_M}
+		      \end{align*}
+
+		      That is $\deg r \leq M-1$
+		\item[Step:] Suppose the statement holds for some $N > M$. Then:
+		      \begin{align*}
+			      P(x)
+			       & = a_{N+1}x^{N+1} + \dots + a_1x + a_0
+			      = x(a_{N+1}x^{N} + \dots + a_2x + a_1) + a_0
+			      \\ &\underset{(a)}{=} x (q(x)\cdot Q(x) + r(x)) + a_0
+			      = (xq(x)) \cdot Q(x) + (xr(x) + a_0)
+		      \end{align*}
+		      where (a) follows from the induction hypothesis, therefore $\deg q \leq N-M$ and $\deg r \leq M - 1$.
+
+		      Note that $\deg xq \leq N+1-M$ and $\deg xr \leq M,\; \deg a_0 = 0$. If the degree of $xr(x) + a_0$ is exactly $M$ we may use the base case to find the decomposition $xr(x) = \tilde{q}(x)Q(x) + \tilde{r}(x)$ where $\deg \tilde{q} = 0$ and $\deg \tilde{r} \leq M-1$. Then $q^*(x) = xq(x) + \tilde{q}(x),\; \deg q^* \leq N+1-M$ and $P(x) = q^*(x)Q(x) + \tilde{r}(x)$
+	\end{enumerate}
+\end{proof}
+
+\begin{theorem} \label{thm:stability}
+	Let $X(z)$ be a $z$-tranform of a causal system $x[n]$ (i.e. $x[n] = 0, \; \forall n<0$). Moreover assume that $X$ is the rational function with distinct non-zero poles. Then $x[n]$ is absolutely summable if the pole with the maximum magnitude lies inside the unit circle.
+\end{theorem}
+\begin{proof}
+	\[X(z) = \frac{P(z^{-1})}{Q(z^{-1})}\]
+	If $\deg P = N > M = \deg Q$, then the Lemma~\ref{lm:long div} ensures that exist $q(z^-1), r(z^-1)$ with $\deg q \leq N-M$ and $\deg r \leq M-1$, s.t. $P(z^{-1}) = q(z^{-1})Q(z^{-1}) + r(z^{-1})$.
+	\[X(z) 
+	= \frac{q(z^{-1})Q(z^{-1}) + r(z^{-1})}{Q(z^{-1})}
+	= q(z^{-1}) + \frac{r(z^{-1})}{Q(z^{-1})}\]
+	
+	Let $d_1, \dots, d_M$ be the poles of $X$ (distinct and non-zero by assumption), so $Q(z^{-1}) = \prod_{i=1}^{M} (1 - d_iz^{-1})$
+
+	Using the Lemma~\ref{lm:partial fraction} we have that exist $A_1, \dots, A_M$, such that:
+	\[\frac{r(z^{-1})}{Q(z^{-1})} 
+	= \sum_{i=1}^{M} \frac{A_i}{1 - d_iz^{-1}}\]
+	\[X(z) 
+	= q(z^{-1}) + \sum_{i=1}^{M} \frac{A_i}{1 - d_iz^{-1}} 
+	= \sum_{i = 0}^{N-M} c_i z^{-i} + \sum_{i=1}^{M} \frac{A_i}{1 - d_iz^{-1}}\]
+
+	The assumption about causality allows us to uniquelly determine the inverse z-transform by inspecting \href{https://en.wikipedia.org/wiki/Z-transform#Table_of_common_Z-transform_pairs}{the table}.
+	\[c_i z^{-i} \iztransform c_i\delta[n-i]\]
+	\[\frac{A_i}{1 - d_iz^{-1}} \iztransform A_i d_i^n u[n]\]
+
+	Using the Lemma~\ref{lm:z linearity}:
+	\[\sum_{i = 0}^{N-M} c_i z^{-i} + \sum_{i=1}^{M} \frac{A_i}{1 - d_iz^{-1}} \iztransform
+	\sum_{i = 0}^{N-M} c_i\delta[n-i] + \sum_{i=1}^{M} A_i d_i^n u[n]\]
+	\[\sum_{n=0}^{\infty} |x[n]|
+	= \sum_{n=-\infty}^{\infty} \left|\sum_{i = 0}^{N-M} c_i\delta[n-i] + \sum_{i=1}^{M} A_i d_i^n u[n] \right|\]
+
+	Note that $\delta[n-i] = 1$ if and only if $n = i$ and zero elsewhere.
+	\begin{align*}
+	\sum_{n=-\infty}^{\infty} |x[n]| &\leq
+	\sum_{n=-\infty}^{\infty} \sum_{i = 0}^{N-M} |c_i\delta[n-i]| + \sum_{i=1}^{M} |A_i d_i^n u[n] |
+	\\ &= \sum_{i = 0}^{N-M} |c_i| + \sum_{n=-\infty}^{\infty} \sum_{i=1}^{M} |A_i d_i^n u[n]|
+	\end{align*}
+
+	We require each sum $\sum_{n=-\infty}^{\infty} |A_i d_i^n u[n]|$ for $\{1, \dots, M\}$ to converge, as this would imply that $\sum_{n=-\infty}^{\infty} \sum_{i=1}^{M} |A_i d_i^n u[n]|$ converges as well by limit additivity.
+	\[\sum_{n=-\infty}^{\infty} |A_i d_i^n u[n]| 
+	= |A_i| \sum_{n=0}^{\infty} |d_i^n| < \infty\]
+	This is the sum of geometric series, hence converges for $d_i$ with $|d_i|<1$. We need this to hold for all $i\in \{1, \dots, M\}$, so $\max_{i} |d_i| < 1$
+\end{proof}
+
+We say that z-transform converges if the series
+\[\sum_{n=-\infty}^{\infty} |x[n]z^{-n}| = \sum_{n=-\infty}^{\infty} |x[n]|r^{-n}\]
+converges (\todo{reference openheim 3.6 for completeness}). It can be easily seen that if the z-transform converges for some point located at the distance $r$ to the origin, then it converges for any point at the circle with radius $r$ centered at the origin. This immediately yields the following equivalence:
+\[X(e^{i\omega})\;\text{converges}\; \forall \omega \in [0, 2\pi] \Leftrightarrow x[n]\;\text{absolutely summable}\]
+
+Return to the Example~\ref{ex:feedback filter}:
+\[y[n] = x_n + \alpha y[n-1]\]
+
+Its transfer function is:
+\[H(z) = \frac{1}{1 - \alpha z^{-1}}\]
+which has the only pole at $z = \alpha$.
+
+\todo{proper justification of y absolute summability}
 
 \newpage
 \subsection{Notch filter}
-We want to construct the transfer function with the zeros corresponding to the frequency $\omega$. Its numerator then is the function $(z^{-1} - e^{i\omega})(z^{-1} - e^{-i\omega})$ since we need to cancel both positive and negative frequency oscilations. Its plot looks as follows:
+We want to construct the transfer function with the zeros corresponding to the frequency $\omega$. Its numerator then is the function $(z^{-1} - e^{i\omega})(z^{-1} - e^{-i\omega})$ since we need to cancel both positive and negative frequency oscillations. If we define the transfer function as is the frequency response looks as follows:
 
-[\todo{PLOT}]
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 1\linewidth]{../plots/notch_freq_response_unscaled.pdf}
+	\caption{the frequency response of $(z^{-1} - e^{i\omega})(z^{-1} - e^{-i\omega})$}
+	\label{fig:notch unscaled freq response}
+\end{figure}
 
-As we can see from the [\todo{figure}] this filter produces a significant uneveness in the spectrum. To mitigate this we divide the transfer function we got previously by $(rz^{-1} - e^{i\omega})(rz^{-1} - e^{-i\omega})$. This helps to flatten the filter since $rz^{-1} - e^{i\omega} \approx (z^{-1} - e^{i\omega})$ for $r$ reasonably close to 1. Note that dividing the transfer function by this expression adds two poles at $d_1 = re^{-i\omega}$ and $d_2 = re^{i\omega}$, so for the filter to be stable (converge for the unit circle) the radius $r$ must be less that 1. The bigger the value of $r$, the closer the pole is to the zeros, so it makes the filter steeper as it "lifts" the surface around it.
+As we can see from the Figure~\ref{fig:notch unscaled freq response} this filter produces a significant uneveness in the spectrum. Moreover we cannot really control the steepness of the constructed filter. To mitigate this we divide the transfer function we got previously by $(rz^{-1} - e^{i\omega})(rz^{-1} - e^{-i\omega})$. This helps to flatten the filter since $rz^{-1} - e^{i\omega} \approx (z^{-1} - e^{i\omega})$ for $r$ reasonably close to 1. Note that dividing the transfer function by this expression adds two poles at $d_1 = re^{-i\omega}$ and $d_2 = re^{i\omega}$, so for the filter to be stable (converge for the unit circle) the radius $r$ must be less that 1 by the Theorem~\ref{thm:stability}. The bigger the value of $r$, the closer the pole is to the zeros, so it makes the filter steeper as it "lifts" the surface around it.
+
+Define:
 \begin{align*}
 	H(z)
-	 & = \frac{(z^{-1} - e^{i\omega})(z^{-1} - e^{-i\omega})}{(rz^{-1} - e^{i\omega})(rz^{-1} - e^{-i\omega})}
-	= \frac{z^{-2} - (e^{-i\omega} + e^{i\omega})z^{-1} + 1}{r^2z^{-2} - r(e^{-i\omega} + e^{i\omega})z^{-1} + 1}
+	= \frac{(z^{-1} - e^{i\omega})(z^{-1} - e^{-i\omega})}{(rz^{-1} - e^{i\omega})(rz^{-1} - e^{-i\omega})}
+	 & = \frac{z^{-2} - (e^{-i\omega} + e^{i\omega})z^{-1} + 1}{r^2z^{-2} - r(e^{-i\omega} + e^{i\omega})z^{-1} + 1}
+	\\ &= \frac{z^{-2} - 2\cos(\omega) z^{-1} + 1}{r^2z^{-2} - 2r\cos(\omega) z^{-1} + 1}
 \end{align*}
 
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 1\linewidth]{../plots/notch_topology.pdf}
+	\caption{the filter topology}
+	\label{fig:notch topology}
+\end{figure}
+
+Note that there are two spike slightly inside of the red circle and two dips. Those are the poles and the zeros of $H$.
+
+\pagebreak
+And its frequency response looks as follows:
+\begin{figure}[htbp!]
+	\begin{center}
+		\includegraphics[width = 1\linewidth]{../plots/notch_freq_response.pdf}
+	\end{center}
+	\caption{the filter frequency response}
+	\label{fig:proper frequency response}
+\end{figure}
+
+Note that for the transfer function $H(z)$ we have:
+\[
+\overline{H(z)}
+=\overline{\frac{z^{-2} - 2\cos(\omega) z^{-1} + 1}{r^2z^{-2} - 2r\cos(\omega) z^{-1} + 1}}
+=\frac{\overline{z^{-2}} - 2\cos(\omega) \overline{z^{-1}} + 1}{r^2\overline{z^{-2}} - 2r\cos(\omega) \overline{z^{-1}} + 1}
+=H(\overline{z})\]
+
+That means for the frequency $e^{-i\theta}$ the frequency response has the same magnitude as for $e^{i\theta}$, but inverted phase. By the Remark~\ref{ex:phase shift}, we have that this directly relates to the corresponding oscillation phase. This allows us the visualize also the phase response of the constructed filter:
+
+\pagebreak
+\begin{figure}[ht!]
+	\begin{center}
+		\includegraphics[width = 1\linewidth]{../plots/notch_phase_response.pdf}
+	\end{center}
+	\caption{the filter phase response}
+\end{figure}
+
 \newpage
-\subsection{Absolutely unnecessary \faTrash}
+\section{Appendix}
+\subsection{Notch filter impulse response \faTrash}
 We perform the long division of the numerator and denominator:
 \begin{align*}
 	z^{-2} - (e^{-i\omega} + e^{i\omega})z^{-1} + 1
