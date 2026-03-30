@@ -678,52 +678,14 @@ We kick off with the example
 	Note that the formula \eqref{eq:feedback filter closed form} can be written as a following convolution:
 	\[y[n]
 		= \sum_{j=0}^{n} \alpha^{n-j} x[j]
-		= \sum_{j=0}^{n} a_n[n-j] x[j]
-		= x \ast a_n\]
+		= \sum_{j=0}^{n} h_n[n-j] x[j]
+		= x \ast h_n\]
 
 	Thus:
-	\[a_n = {\left(\alpha^0, \alpha^1, \dots, \alpha^{n}\right)}^{T}\]
+	\[h_n = {\left(\alpha^0, \alpha^1, \dots, \alpha^{n}\right)}^{T}\]
 
 	As in the case of Ideal low pass filter in Section~\ref{sec:ideal lpf} we got an impulse response of the filter introduced above. The only difference is that this filter has an impulse response with the size proportional to the sample size. That said the IR size grows infinitely in time unlike the IR of an ideal LPF, which has the same size for each frame.
-
-	We make an assumption on $x$, that its series is absolutely convergent. That is
-	\[\sum_{n=0}^{\infty} |x[n]| < \infty\]
-
-	Then for $n>m$ we have the following estimate for $0< \alpha < 1$:
-	\[\begin{aligned}
-			|y[n] - y[m]|
-			 & = \left|\sum_{j=0}^{n} \alpha^{n-j} x[j] - \sum_{j=0}^{m} \alpha^{m-j} x[j]\right|
-			\\ &= \left|\sum_{j=0}^{m} (\alpha^{n-j} - \alpha^{m-j}) x[j] + \sum_{j=m+1}^{n} \alpha^{n-j} x[j]\right|
-			\\ &\leq \left|\sum_{j=0}^{m} (\alpha^{n-j} - \alpha^{m-j}) x[j]\right| + \left|\sum_{j=m+1}^{n} \alpha^{n-j} x[j]\right|
-		\end{aligned}\]
-
-	Since the sum $\sum_{n=0}^{\infty} |x[n]|$ converges we have that $x_n$ is the zero sequence, hence for any $\varepsilon>0$ exists $n_0$, s.t. $|x_n| < \varepsilon \; \forall n \geq n_0$:
-	\[\begin{aligned}
-			\left|\sum_{j=0}^{m} (\alpha^{n-j} - \alpha^{m-j}) x[j]\right|
-			\leq \sum_{j=0}^{m} |\alpha^{n-j} - \alpha^{m-j}| \cdot |x[j]|
-			 & =    \\ \sum_{j=0}^{n_0} |\alpha^{n-j} - \alpha^{m-j}| \cdot |x[j]| + \sum_{j=n_0}^{m} |\alpha^{n-j} - \alpha^{m-j}| \cdot |x[j]|
-			 & \leq \\ \sum_{j=0}^{n_0} |\alpha^{n-j} - \alpha^{m-j}| \cdot |x[j]| + \varepsilon \sum_{j=n_0}^{m} |\alpha^{n-j} - \alpha^{m-j}|
-		\end{aligned}\]
-
-	With the assumption that $n > m$ we have $n - j > m - j$, so by the monotonicty of $\alpha^x$ we have that $\alpha^{n-j}< \alpha^{m-j} \Rightarrow |\alpha^{n-j} - \alpha^{m-j}| = \alpha^{m-j} - \alpha^{n-j} \leq \alpha^{m-j}$. Moreover $\sum_{j=n_0}^{m} \alpha^{m-j} \leq \sum_{j=0}^{\infty} \alpha^{j} = C \leq \infty$ since $m-j$ stays positive on the entire range of summation. For the same exact reason $|\alpha^{n-j} - \alpha^{m-j}| = \alpha^{m-j} - \alpha^{n-j} \leq \alpha^{m-n_0}$ if $j\leq n_0$. By combining those two estimates together:
-	\[\begin{aligned}
-			\sum_{j=0}^{n_0} |\alpha^{n-j} - \alpha^{m-j}| \cdot |x[j]| + \varepsilon \sum_{j=n_0}^{m} |\alpha^{n-j} - \alpha^{m-j}|
-			 & \leq \\ \alpha^{m-n_0} \sum_{j=0}^{n_0} |x[j]| + C \varepsilon = \alpha^{m-n_0} M + C \varepsilon \rightarrow 0
-		\end{aligned}\]
-	as we can choose such $m$, that $\alpha^{m-n_0} M < \varepsilon$, so the whole expression is bounded by $(C+1)\varepsilon$
-
-	For the second term we have that:
-	\[\left|\sum_{j=m+1}^{n} \alpha^{n-j} x[j]\right|
-		\leq \sum_{j=m+1}^{n} |\alpha^{n-j}| |x[j]|
-		\leq \sum_{j=m+1}^{n} |x[j]|\]
-	which can be made arbitrarily small as the tail sum of a convergent sequence.
-
-	This proves for that sufficiently large $m$ we can get $|y[n] - y[m]|$ arbitrarily small, so $y[n]$ is a Cauchy sequence and hence converges.
 \end{example}
-
-\todo{FIX THIS ENTIRELY}
-
-Observe that the way we proved the filter output to be absolutely summable became really tedious despite the simplicty of its definition. That motivates us develop the set of tools to analyze such filters relatively easy.
 
 \newpage
 \subsection{Stability}
@@ -731,6 +693,123 @@ Let us consider the general form of the filters we would like to analyze:
 \begin{equation}
 	y[n] = \sum_{i=0}^{N} b_i x[n - i] + \sum_{i=1}^{M} a_i y[n - i] \label{eq:IIR def}
 \end{equation}
+
+\begin{theorem}[Discrete Tonelli] \label{thm:discrete tonelli}
+	Let us have the sequence $x_{kn} \in [0;\infty]$. Then:
+	\[
+		\sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} x_{kn}
+		= \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x_{kn}\]
+\end{theorem}
+\begin{proof}
+	We have that the space $(\Z, \curlyP(\Z), \mu)$ is $\sigma$-finite with the counting measure $\mu$. This is easily verified using that $\Z = \bigcup_{k \in \Z} \{k\}$. Therefore the product measure $\mu \otimes \mu$ is well-defined and unique.
+
+	Define
+	\[
+		f:\Z \times \Z \to [0;\infty], \quad (n, k) \mapsto x_{nk}\]
+
+	We define the functino slices as:
+	\begin{align*}
+		f_n: \Z \to [0;\infty]     & , \quad k \mapsto x_{nk} \\
+		f^{(k)}: \Z \to [0;\infty] & , \quad n \mapsto x_{nk}
+	\end{align*}
+
+	And we observe that $\ind_{[-K, K]} \cdot f_{n} = \sum_{k=-K}^{K} \ind_{\{k\}} \cdot x_{nk} \uparrow f_n$, so using the the fact that each $\ind_{[-K, K]} \cdot f_{n}$ is simple:
+	\[\int_{\Z} \ind_{[-K, K]} \cdot f_{n} \dx{\mu(k)}
+		= \sum_{k=-K}^{K} \mu(\{k\}) x_{nk}
+		= \sum_{k=-K}^{K} x_{nk} \]
+	Using Monotone convergence theorem:
+	\begin{align*}
+		\sum_{k=-\infty}^{\infty} x_{nk}
+		 & = \lim_{K \to \infty} \int_{\Z} \ind_{[-K, K]} \cdot f_{n} \dx{\mu(k)}
+		\\ &= \int_{\Z} \lim_{K \to \infty} \left( \ind_{[-K, K]} \cdot f_{n} \right) \dx{\mu(k)}
+		= \int_{\Z} f_{n}(k) \dx{\mu(k)}
+	\end{align*}
+
+	Using the similar construction:
+	\[g:\Z \to [0;\infty], \quad n \to \int_{\Z} f_{n}(k) \dx{\mu(k)}\]
+
+	And its approximation:
+	\[\ind_{[-N, N]} \cdot g
+		= \sum_{n=-N}^{N} \left(\ind_{\{n\}}\int_{\Z} f_{n}(k) \dx{\mu(k)}\right) \uparrow g\]
+	since the integral of the positive function $f_n$ is positive as well, so $g \geq 0$.
+	\begin{align*}
+		\sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x_{nk}
+		 & = \lim_{N \to \infty} \int_{\Z} \ind_{[-N, N]} \cdot g(n) \dx{\mu(n)}
+		\\ &= \int_{\Z} \lim_{N \to \infty} \left( \ind_{[-N, N]} \cdot g(n) \right) \dx{\mu(n)}
+		\\ &= \int_{\Z} g(n) \dx{\mu(n)}
+		= \int_{\Z} \int_{\Z} f_{n}(k) \dx{\mu(k)} \dx{\mu(n)}
+	\end{align*}
+
+	Using Tonelli's theorem we have:
+	\[\int_{\Z \times \Z} f \dx{\mu \otimes \mu (n, k)}
+		= \int_{\Z} \int_{\Z} f_{n}(k) \dx{\mu(k)} \dx{\mu(n)}
+		= \int_{\Z} \int_{\Z} f^{(k)}(n) \dx{\mu(n)} \dx{\mu(k)}\]
+
+	In a similar fashion we can show for the slice at a height $k$:
+	\[\sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} x_{nk}
+		= \int_{\Z} \int_{\Z} f^{(k)}(n) \dx{\mu(n)} \dx{\mu(k)}\]
+
+	Which proves:
+	\[\sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} x_{nk}
+		= \int_{\Z \times \Z} f \dx{\mu \otimes \mu (n, k)}
+		= \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x_{nk} \]
+\end{proof}
+
+\begin{theorem}[Discrete Fubini] \label{thm:discrete fubini}
+	Let us have the sequence $z_{kn} \in \C$ with
+	\[\sum_{(n, k) \in Z \times \Z} |z_{kn}| < \infty\]
+	Then:
+	\[
+		\sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} z_{kn}
+		= \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} z_{kn}\]
+\end{theorem}
+\begin{proof}
+	Let $x_{kn} \in \R$ and define:
+	\[
+		x_{kn}^+ = \begin{cases}
+			x_{kn}, \; x_{kn} \geq 0 \\
+			0, x_{kn} < 0
+		\end{cases} \quad
+		x_{kn}^- = \begin{cases}
+			-x_{kn}, \; x_{kn} < 0 \\
+			0, x_{kn} \geq 0
+		\end{cases} \]
+
+	Recall that if both sums $\sum_{n=-\infty}^{\infty} a_n$ and $\sum_{n=-\infty}^{\infty} b_n$ with $a_n, b_n \in \R$ exist then:
+	\begin{align*}
+		\sum_{n=-\infty}^{\infty} (a_n - b_n)
+		 & = \lim_{N\to \infty} \left(\sum_{n=-N}^{N} (a_n - b_n)\right)
+		\\ &= \lim_{N\to \infty} \left(\sum_{n=-N}^{N} a_n - \sum_{n=-N}^{N} b_n\right)
+		\\ &= \lim_{N\to \infty} \left(\sum_{n=-N}^{N} a_n\right) - \lim_{N\to \infty}  \left(\sum_{n=-N}^{N} b_n\right)
+		\\ &= \sum_{n=-\infty}^{\infty} a_n - \sum_{n=-\infty}^{\infty} b_n
+	\end{align*}
+
+	We have that:
+	\[
+		\left|\sum_{k = -\infty}^{\infty} x^{\pm}_{kn} \right|
+		= \sum_{k = -\infty}^{\infty} x^{\pm}_{kn}
+		\leq \sum_{k=-\infty}^{\infty} |x_{kn}| \quad \forall k \in \Z < \infty\]
+	so using the comparison principle we have the following:
+	\[
+		\sum_{n = -\infty}^{\infty} \sum_{k = -\infty}^{\infty} x^{\pm}_{kn} < \infty\]
+
+	Therefore:
+	\begin{align*}
+		\sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x_{kn}
+		= \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} (x^+_{kn} - x^-_{kn})
+		= \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x^+_{kn} - \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x^-_{kn}
+	\end{align*}
+
+	The sum order can be interchanged by Theorem~\ref{thm:discrete tonelli}:
+	\begin{align*}
+		\sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x^+_{kn} - \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x^-_{kn}
+		 & = \sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} x^+_{kn} - \sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} x^-_{kn}
+		\\ &= \sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} (x^+_{kn} - x^-_{kn})
+		\\ &= \sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} x_{kn}
+	\end{align*}
+
+	This argument can be generalized for $z_{kn} \in C$ using the auxiliary sequences $r_{kn} = \real(z_{kn})$ and $s_{kn} = \imag(z_{kn})$. Both are absolutely summable since $|r_{kn}|, |s_{kn}| < |z_{kn}|$. This immediately results in the desired result applying the previous argumentation to $r_{kn}$ and $s_{kn}$.
+\end{proof}
 
 \begin{lemma}[Z-transform properties]
 	Let $x \ztransform X(z)$ and $y \ztransform Y(z)$. The following holds:
@@ -834,23 +913,23 @@ is exactly the Z-transform of the signal $y$ (embedded into the infinite sequenc
 \end{proof}
 
 \begin{theorem} \label{thm:stability}
-	Let $X(z)$ be a $z$-tranform of a causal system $x[n]$ (i.e. $x[n] = 0, \; \forall n<0$). Moreover assume that $X$ is the rational function with distinct non-zero poles. Then $x[n]$ is absolutely summable if the pole with the maximum magnitude lies inside the unit circle.
+	Let $X(z)$ be a $z$-tranform of a causal system $x[n]$ (i.e. $x[n] = 0, \; \forall n<0$). Moreover assume that $X$ is the rational function with distinct non-zero poles. Then $x[n]$ is absolutely summable if and only if the pole with the maximum magnitude lies inside the unit circle.
 \end{theorem}
 \begin{proof}
 	\[X(z) = \frac{P(z^{-1})}{Q(z^{-1})}\]
-	If $\deg P = N > M = \deg Q$, then the Lemma~\ref{lm:long div} ensures that exist $q(z^-1), r(z^-1)$ with $\deg q \leq N-M$ and $\deg r \leq M-1$, s.t. $P(z^{-1}) = q(z^{-1})Q(z^{-1}) + r(z^{-1})$.
-	\[X(z) 
-	= \frac{q(z^{-1})Q(z^{-1}) + r(z^{-1})}{Q(z^{-1})}
-	= q(z^{-1}) + \frac{r(z^{-1})}{Q(z^{-1})}\]
-	
+	If $\deg P = N \geq M = \deg Q$, then the Lemma~\ref{lm:long div} ensures that exist $q(z^{-1}), r(z^{-1})$ with $\deg q \leq N-M$ and $\deg r \leq M-1$, s.t. $P(z^{-1}) = q(z^{-1})Q(z^{-1}) + r(z^{-1})$. IF $N < M$, then $q = 0$ and $r = P$
+	\[X(z)
+		= \frac{q(z^{-1})Q(z^{-1}) + r(z^{-1})}{Q(z^{-1})}
+		= q(z^{-1}) + \frac{r(z^{-1})}{Q(z^{-1})}\]
+
 	Let $d_1, \dots, d_M$ be the poles of $X$ (distinct and non-zero by assumption), so $Q(z^{-1}) = \prod_{i=1}^{M} (1 - d_iz^{-1})$
 
 	Using the Lemma~\ref{lm:partial fraction} we have that exist $A_1, \dots, A_M$, such that:
-	\[\frac{r(z^{-1})}{Q(z^{-1})} 
-	= \sum_{i=1}^{M} \frac{A_i}{1 - d_iz^{-1}}\]
-	\[X(z) 
-	= q(z^{-1}) + \sum_{i=1}^{M} \frac{A_i}{1 - d_iz^{-1}} 
-	= \sum_{i = 0}^{N-M} c_i z^{-i} + \sum_{i=1}^{M} \frac{A_i}{1 - d_iz^{-1}}\]
+	\[\frac{r(z^{-1})}{Q(z^{-1})}
+		= \sum_{i=1}^{M} \frac{A_i}{1 - d_iz^{-1}}\]
+	\[X(z)
+		= q(z^{-1}) + \sum_{i=1}^{M} \frac{A_i}{1 - d_iz^{-1}}
+		= \sum_{i = 0}^{N-M} c_i z^{-i} + \sum_{i=1}^{M} \frac{A_i}{1 - d_iz^{-1}}\]
 
 	The assumption about causality allows us to uniquelly determine the inverse z-transform by inspecting \href{https://en.wikipedia.org/wiki/Z-transform#Table_of_common_Z-transform_pairs}{the table}.
 	\[c_i z^{-i} \iztransform c_i\delta[n-i]\]
@@ -858,26 +937,55 @@ is exactly the Z-transform of the signal $y$ (embedded into the infinite sequenc
 
 	Using the Lemma~\ref{lm:z linearity}:
 	\[\sum_{i = 0}^{N-M} c_i z^{-i} + \sum_{i=1}^{M} \frac{A_i}{1 - d_iz^{-1}} \iztransform
-	\sum_{i = 0}^{N-M} c_i\delta[n-i] + \sum_{i=1}^{M} A_i d_i^n u[n]\]
+		\sum_{i = 0}^{N-M} c_i\delta[n-i] + \sum_{i=1}^{M} A_i d_i^n u[n]\]
 	\[\sum_{n=0}^{\infty} |x[n]|
-	= \sum_{n=-\infty}^{\infty} \left|\sum_{i = 0}^{N-M} c_i\delta[n-i] + \sum_{i=1}^{M} A_i d_i^n u[n] \right|\]
+		= \sum_{n=-\infty}^{\infty} \left|\sum_{i = 0}^{N-M} c_i\delta[n-i] + \sum_{i=1}^{M} A_i d_i^n u[n] \right|\]
 
 	Note that $\delta[n-i] = 1$ if and only if $n = i$ and zero elsewhere.
 	\begin{align*}
-	\sum_{n=-\infty}^{\infty} |x[n]| &\leq
-	\sum_{n=-\infty}^{\infty} \sum_{i = 0}^{N-M} |c_i\delta[n-i]| + \sum_{i=1}^{M} |A_i d_i^n u[n] |
-	\\ &= \sum_{i = 0}^{N-M} |c_i| + \sum_{n=-\infty}^{\infty} \sum_{i=1}^{M} |A_i d_i^n u[n]|
+		\sum_{n=-\infty}^{\infty} |x[n]| & \leq
+		\sum_{n=-\infty}^{\infty} \sum_{i = 0}^{N-M} |c_i\delta[n-i]| + \sum_{n=-\infty}^{\infty} \sum_{i=1}^{M} |A_i d_i^n u[n] |
+		\\ &= \sum_{i = 0}^{N-M} |c_i| + \sum_{n=-\infty}^{\infty} \sum_{i=1}^{M} |A_i d_i^n u[n]|
 	\end{align*}
 
-	We require each sum $\sum_{n=-\infty}^{\infty} |A_i d_i^n u[n]|$ for $\{1, \dots, M\}$ to converge, as this would imply that $\sum_{n=-\infty}^{\infty} \sum_{i=1}^{M} |A_i d_i^n u[n]|$ converges as well by limit additivity.
-	\[\sum_{n=-\infty}^{\infty} |A_i d_i^n u[n]| 
-	= |A_i| \sum_{n=0}^{\infty} |d_i^n| < \infty\]
-	This is the sum of geometric series, hence converges for $d_i$ with $|d_i|<1$. We need this to hold for all $i\in \{1, \dots, M\}$, so $\max_{i} |d_i| < 1$
+	By Theorem~\ref{thm:discrete tonelli} and the proper extention of the finite sum to the infinite one (with zeros wherever the sequence is not defined):
+	\[\sum_{i = 0}^{N-M} |c_i| + \sum_{n=-\infty}^{\infty} \sum_{i=1}^{M} |A_i d_i^n u[n]|
+		= \sum_{i = 0}^{N-M} |c_i| +  \sum_{i=1}^{M} \sum_{n=-\infty}^{\infty} |A_i d_i^n u[n]|\]
+
+	And one can note that it converges if and only if
+	\[\sum_{n=-\infty}^{\infty} |A_i d_i^n u[n]|
+		= |A_i| \sum_{n=0}^{\infty} |d_i^n| < \infty
+		\quad \forall i \in \{1, \dots, M\}\]
+	This is the sum of geometric series, hence converges if and only if $|d_i|<1$. We need this to hold for all $i\in \{1, \dots, M\}$, so $\max_{i} |d_i| < 1$
+\end{proof}
+\begin{theorem} \label{thm:convolution theorem z transform}
+	Let $x \ztransform X(z)$ and $y \ztransform Y(z)$, with both $x,y$ being absolutely summable. Then $x \ast y \ztransform X(z)\cdot Y(z)$
+\end{theorem}
+\begin{proof}
+	\[
+		h[n] = x \ast y
+		= \sum_{k=-\infty}^{\infty} x[k] y[n-k]\]
+	By Theorem~\ref{thm:discrete tonelli}:
+	\begin{align*}
+		\sum_{n=-\infty}^{\infty} |h[n]|
+		 & = \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} |x[k] y[n-k]|
+		\\ &\leq \sum_{k=-\infty}^{\infty} \left( |x[k]| \sum_{n=-\infty}^{\infty} |y[n-k]| \right)
+		\\ &= \sum_{n=-\infty}^{\infty} |y[n]| \cdot \sum_{k=-\infty}^{\infty} |x[k]| < \infty
+	\end{align*}
+
+	By applying Theorem~\ref{thm:discrete fubini} and Lemma~\ref{lm:z time shift} (time shift property):
+	\begin{align*}
+		\sum_{n=-\infty}^{\infty} h[n] z^{-n}
+		&= \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x[k] y[n-k] z^{-n}
+		\\ &= \sum_{k=-\infty}^{\infty} x[k] \sum_{n=-\infty}^{\infty} y[n-k] z^{-n}
+		\\ &= Y(z) \sum_{k=-\infty}^{\infty} x[k] z^{-k}
+		\\ &= X(z) Y(z)
+	\end{align*}
 \end{proof}
 
 We say that z-transform converges if the series
 \[\sum_{n=-\infty}^{\infty} |x[n]z^{-n}| = \sum_{n=-\infty}^{\infty} |x[n]|r^{-n}\]
-converges (\todo{reference openheim 3.6 for completeness}). It can be easily seen that if the z-transform converges for some point located at the distance $r$ to the origin, then it converges for any point at the circle with radius $r$ centered at the origin. This immediately yields the following equivalence:
+converges\footnote{A. V. Oppenheim and R. W. Schafer, \textit{Discrete-Time Signal Processing}, 3rd ed. Upper Saddle River, NJ: Pearson, 2010, eq. (3.7).}. It can be easily seen that if the z-transform converges for some point located at the distance $r$ to the origin, then it converges for any point at the circle with radius $r$ centered at the origin. This immediately yields the following equivalence:
 \[X(e^{i\omega})\;\text{converges}\; \forall \omega \in [0, 2\pi] \Leftrightarrow x[n]\;\text{absolutely summable}\]
 
 Return to the Example~\ref{ex:feedback filter}:
@@ -931,12 +1039,12 @@ And its frequency response looks as follows:
 
 Note that for the transfer function $H(z)$ we have:
 \[
-\overline{H(z)}
-=\overline{\frac{z^{-2} - 2\cos(\omega) z^{-1} + 1}{r^2z^{-2} - 2r\cos(\omega) z^{-1} + 1}}
-=\frac{\overline{z^{-2}} - 2\cos(\omega) \overline{z^{-1}} + 1}{r^2\overline{z^{-2}} - 2r\cos(\omega) \overline{z^{-1}} + 1}
-=H(\overline{z})\]
+	\overline{H(z)}
+	=\overline{\frac{z^{-2} - 2\cos(\omega) z^{-1} + 1}{r^2z^{-2} - 2r\cos(\omega) z^{-1} + 1}}
+	=\frac{\overline{z^{-2}} - 2\cos(\omega) \overline{z^{-1}} + 1}{r^2\overline{z^{-2}} - 2r\cos(\omega) \overline{z^{-1}} + 1}
+	=H(\overline{z})\]
 
-That means for the frequency $e^{-i\theta}$ the frequency response has the same magnitude as for $e^{i\theta}$, but inverted phase. By the Remark~\ref{ex:phase shift}, we have that this directly relates to the corresponding oscillation phase. This allows us the visualize also the phase response of the constructed filter:
+That means for the frequency $e^{-i\theta}$ the frequency response has the same magnitude as for $e^{i\theta}$, but inverted phase. By the Remark~\ref{ex:phase shift}, we have that the phase of the frequency response directly relates to the corresponding oscillation phase. This allows us the visualize also the phase response of the constructed filter:
 
 \pagebreak
 \begin{figure}[ht!]
@@ -1017,10 +1125,4 @@ Now we are able to compute the inverse transform using the fact that
 	\\ & \iztransform \frac{1}{r^2}
 	\delta[n] - Ar^ne^{-i\omega(n+1)}u[n] - Br^ne^{i\omega(n+1)}u[n]
 \end{align*}
-
-\newpage
-\begin{thebibliography}{8}
-	\bibitem{fourier}
-	Elias M. Stein and Rami Shakarchi (2003) \emph{Fourier Analysis: An Introduction}
-\end{thebibliography}
 \end{document}
