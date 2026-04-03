@@ -12,10 +12,10 @@
 
 \hypersetup{
     colorlinks=true,
-    linkcolor=blue,      % Color for internal links (sections, etc.)
+    linkcolor=cyan,      % Color for internal links (sections, etc.)
     citecolor=green,     % Color for bibliographical citations
     filecolor=magenta,   % Color for file links
-    urlcolor=cyan        % Color for external hyperlinks
+    urlcolor=purple        % Color for external hyperlinks
 }
 
 \title{Digital signal processing}
@@ -597,7 +597,7 @@ By the Theorem $\ref{thm:discrete convolution theorem}$:
 \[\frac{1}{\sqrt N}(F(x\circledast y)) = Fx \odot Fy\]
 which allows us to implement the low pass filter using its impulse response. That is the point, where theory meets the real world example and makes use of the abstract theorem. In general this concept can be generalaized to any signal, which can be used, for instance for reverb implementation if we have an impulse response of a room (a recording of echo induced by a short impact).
 
-Now we take a closer look on the expression we had derived above:
+Now we take a closer look on the expression we have derived above:
 \[
 	e^{-ix}-e^{ix} = 2\imag(e^{-ix}) = 2i\sin(-x) = -2i\sin(x)\]
 \[
@@ -695,10 +695,10 @@ Let us consider the general form of the filters we would like to analyze:
 \end{equation}
 
 \begin{theorem}[Discrete Tonelli] \label{thm:discrete tonelli}
-	Let us have the sequence $x_{kn} \in [0;\infty]$. Then:
+	Let us have the sequence $x_{nk} \in [0;\infty]$. Then:
 	\[
-		\sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} x_{kn}
-		= \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x_{kn}\]
+		\sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} x_{nk}
+		= \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x_{nk}\]
 \end{theorem}
 \begin{proof}
 	We have that the space $(\Z, \curlyP(\Z), \mu)$ is $\sigma$-finite with the counting measure $\mu$. This is easily verified using that $\Z = \bigcup_{k \in \Z} \{k\}$. Therefore the product measure $\mu \otimes \mu$ is well-defined and unique.
@@ -707,7 +707,7 @@ Let us consider the general form of the filters we would like to analyze:
 	\[
 		f:\Z \times \Z \to [0;\infty], \quad (n, k) \mapsto x_{nk}\]
 
-	We define the functino slices as:
+	We define the function slices as:
 	\begin{align*}
 		f_n: \Z \to [0;\infty]     & , \quad k \mapsto x_{nk} \\
 		f^{(k)}: \Z \to [0;\infty] & , \quad n \mapsto x_{nk}
@@ -756,23 +756,23 @@ Let us consider the general form of the filters we would like to analyze:
 \end{proof}
 
 \begin{theorem}[Discrete Fubini] \label{thm:discrete fubini}
-	Let us have the sequence $z_{kn} \in \C$ with
-	\[\sum_{(n, k) \in Z \times \Z} |z_{kn}| < \infty\]
+	Let us have the sequence $z_{nk} \in \C$ with
+	\[\sum_{(n, k) \in Z \times \Z} |z_{nk}| < \infty\]
 	Then:
 	\[
-		\sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} z_{kn}
-		= \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} z_{kn}\]
+		\sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} z_{nk}
+		= \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} z_{nk}\]
 \end{theorem}
 \begin{proof}
-	Let $x_{kn} \in \R$ and define:
+	Let $x_{nk} \in \R$ and define:
 	\[
-		x_{kn}^+ = \begin{cases}
-			x_{kn}, \; x_{kn} \geq 0 \\
-			0, x_{kn} < 0
+		x_{nk}^+ = \begin{cases}
+			x_{nk}, \; x_{nk} \geq 0 \\
+			0, x_{nk} < 0
 		\end{cases} \quad
-		x_{kn}^- = \begin{cases}
-			-x_{kn}, \; x_{kn} < 0 \\
-			0, x_{kn} \geq 0
+		x_{nk}^- = \begin{cases}
+			-x_{nk}, \; x_{nk} < 0 \\
+			0, x_{nk} \geq 0
 		\end{cases} \]
 
 	Recall that if both sums $\sum_{n=-\infty}^{\infty} a_n$ and $\sum_{n=-\infty}^{\infty} b_n$ with $a_n, b_n \in \R$ exist then:
@@ -786,29 +786,29 @@ Let us consider the general form of the filters we would like to analyze:
 
 	We have that:
 	\[
-		\left|\sum_{k = -\infty}^{\infty} x^{\pm}_{kn} \right|
-		= \sum_{k = -\infty}^{\infty} x^{\pm}_{kn}
-		\leq \sum_{k=-\infty}^{\infty} |x_{kn}| \quad \forall k \in \Z < \infty\]
+		\left|\sum_{k = -\infty}^{\infty} x^{\pm}_{nk} \right|
+		= \sum_{k = -\infty}^{\infty} x^{\pm}_{nk}
+		\leq \sum_{k=-\infty}^{\infty} |x_{nk}| \quad \forall k \in \Z < \infty\]
 	so using the comparison principle we have the following:
 	\[
-		\sum_{n = -\infty}^{\infty} \sum_{k = -\infty}^{\infty} x^{\pm}_{kn} < \infty\]
+		\sum_{n = -\infty}^{\infty} \sum_{k = -\infty}^{\infty} x^{\pm}_{nk} < \infty\]
 
 	Therefore:
 	\begin{align*}
-		\sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x_{kn}
-		= \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} (x^+_{kn} - x^-_{kn})
-		= \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x^+_{kn} - \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x^-_{kn}
+		\sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x_{nk}
+		= \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} (x^+_{nk} - x^-_{nk})
+		= \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x^+_{nk} - \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x^-_{nk}
 	\end{align*}
 
 	The sum order can be interchanged by Theorem~\ref{thm:discrete tonelli}:
 	\begin{align*}
-		\sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x^+_{kn} - \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x^-_{kn}
-		 & = \sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} x^+_{kn} - \sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} x^-_{kn}
-		\\ &= \sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} (x^+_{kn} - x^-_{kn})
-		\\ &= \sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} x_{kn}
+		\sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x^+_{nk} - \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x^-_{nk}
+		 & = \sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} x^+_{nk} - \sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} x^-_{nk}
+		\\ &= \sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} (x^+_{nk} - x^-_{nk})
+		\\ &= \sum_{k=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} x_{nk}
 	\end{align*}
 
-	This argument can be generalized for $z_{kn} \in C$ using the auxiliary sequences $r_{kn} = \real(z_{kn})$ and $s_{kn} = \imag(z_{kn})$. Both are absolutely summable since $|r_{kn}|, |s_{kn}| < |z_{kn}|$. This immediately results in the desired result applying the previous argumentation to $r_{kn}$ and $s_{kn}$.
+	This argument can be generalized for $z_{nk} \in C$ using the auxiliary sequences $r_{nk} = \real(z_{nk})$ and $s_{nk} = \imag(z_{nk})$. Both are absolutely summable since $|r_{nk}|, |s_{nk}| < |z_{nk}|$. This immediately results in the desired result applying the previous argumentation to $r_{nk}$ and $s_{nk}$.
 \end{proof}
 
 \begin{lemma}[Z-transform properties]
@@ -976,7 +976,7 @@ is exactly the Z-transform of the signal $y$ (embedded into the infinite sequenc
 	By applying Theorem~\ref{thm:discrete fubini} and Lemma~\ref{lm:z time shift} (time shift property):
 	\begin{align*}
 		\sum_{n=-\infty}^{\infty} h[n] z^{-n}
-		&= \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x[k] y[n-k] z^{-n}
+		 & = \sum_{n=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} x[k] y[n-k] z^{-n}
 		\\ &= \sum_{k=-\infty}^{\infty} x[k] \sum_{n=-\infty}^{\infty} y[n-k] z^{-n}
 		\\ &= Y(z) \sum_{k=-\infty}^{\infty} x[k] z^{-k}
 		\\ &= X(z) Y(z)
@@ -985,7 +985,7 @@ is exactly the Z-transform of the signal $y$ (embedded into the infinite sequenc
 
 We say that z-transform converges if the series
 \[\sum_{n=-\infty}^{\infty} |x[n]z^{-n}| = \sum_{n=-\infty}^{\infty} |x[n]|r^{-n}\]
-converges\footnote{A. V. Oppenheim and R. W. Schafer, \textit{Discrete-Time Signal Processing}, 3rd ed. Upper Saddle River, NJ: Pearson, 2010, eq. (3.7).}. It can be easily seen that if the z-transform converges for some point located at the distance $r$ to the origin, then it converges for any point at the circle with radius $r$ centered at the origin. This immediately yields the following equivalence:
+converges\footnote{A. V. Oppenheim and R. W. Schafer, \textit{Discrete-Time Signal Processing}, 3rd ed. Upper Saddle River, NJ: Pearson, 2010, eq. (3.7).}. It can be easily seen that if the z transform converges for some point located at the distance $r$ to the origin, then it converges for any point at the circle with radius $r$ centered at the origin. This immediately yields the following equivalence:
 \[X(e^{i\omega})\;\text{converges}\; \forall \omega \in [0, 2\pi] \Leftrightarrow x[n]\;\text{absolutely summable}\]
 
 Return to the Example~\ref{ex:feedback filter}:
@@ -993,9 +993,16 @@ Return to the Example~\ref{ex:feedback filter}:
 
 Its transfer function is:
 \[H(z) = \frac{1}{1 - \alpha z^{-1}}\]
-which has the only pole at $z = \alpha$.
+which has the only pole at $z = \alpha$, for which we require $|\alpha|< 1$, so that the ROC of $H$ includes the unit circle.
 
-\todo{proper justification of y absolute summability}
+By definition of the tranfer function:
+\[Y(z) = X(z)H(z)\]
+
+Let $X \iztransform y$ and $H \iztransform h$, where both $x$ and $h$ are right-sided sequences.
+
+Consider $(x \ast h)[n] = \sum_{k = -\infty}^{\infty} x[k] h[n-k] = 0$. For $n<0$ we have that $n - k \geq 0 \Leftrightarrow k \leq n < 0$. In this case we have that $x[k] = 0$ since $k < 0$, so $(x \ast h)[n] = 0$.
+
+By Theorem~\ref{thm:convolution theorem z transform} we have that $X(z)H(z) \iztransform x \ast h := y$ as we require $y$ to be right-sided, so the inverse z transform is unique. If all the poles of the tranfer function lie inside of the unit circle, then by Theorem~\ref{thm:stability} we have that $h$ is absolutely summable. Moreover the Theorem~\ref{thm:convolution theorem z transform} shows that the convolution of two absolutely summable sequences is absolutely summable as well. Therefore $y$ is absolutely summable and hence the filter is stable.
 
 \newpage
 \subsection{Notch filter}
@@ -1053,6 +1060,14 @@ That means for the frequency $e^{-i\theta}$ the frequency response has the same 
 	\end{center}
 	\caption{the filter phase response}
 \end{figure}
+
+In a similar fashion we can build a peak filter by moving the zero of the filter closer to the origin, so that the pole influences the unit circle (frequnecy response) than the zeros do.
+\begin{align*}
+	H(z) = \frac{r_1^2 z^{-2} - 2 r_1 \cos(\omega) z^{-1} + 1}{r_2^2z^{-2} - 2 r_2 \cos(\omega) z^{-1} + 1}
+	\qquad r_1 < r_2 < 1
+\end{align*}
+
+The notch filter then is the special case, where $r_1 = 1$.
 
 \newpage
 \section{Appendix}
