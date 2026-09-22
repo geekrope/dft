@@ -1,0 +1,7 @@
+1. 5.1.2 Phase Distortion and Delay (p.242) — this is where group delay is actually defined and motivated. Read this first.
+2. 5.4 Relationship between Magnitude and Phase (p.270) — short section, sets up why magnitude and phase aren't independent for causal systems, which is the setup minimum-phase depends on.
+3. 5.5 All-Pass Systems (p.274) — needed as a building block for 5.6.
+4. 5.6 Minimum-Phase Systems, specifically:
+   - 5.6.1 Minimum-Phase and All-Pass Decomposition (p.280) — the core definition/theorem.
+   - 5.6.3 Properties of Minimum-Phase Systems (p.287) — the payoff: least-delay property, stable inverse, etc.
+   - You can skip 5.6.2 Frequency-Response Compensation unless you specifically care about equalizer design.

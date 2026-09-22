@@ -1,0 +1,13 @@
+\contentsline {section}{\numberline {1}Conventions}{2}{section.1}%
+\contentsline {section}{\numberline {2}DFT}{3}{section.2}%
+\contentsline {section}{\numberline {3}FFT}{7}{section.3}%
+\contentsline {section}{\numberline {4}Finite impulse response filters}{9}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Convolution theorem}{9}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Ideal LPF}{12}{subsection.4.2}%
+\contentsline {section}{\numberline {5}Infinite impulse response filters}{14}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Stability}{15}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Notch filter}{24}{subsection.5.2}%
+\contentsline {section}{\numberline {6}Minimum phase}{26}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Group delay}{26}{subsection.6.1}%
+\contentsline {section}{\numberline {7}Appendix}{30}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Notch filter impulse response \faTrash }{30}{subsection.7.1}%

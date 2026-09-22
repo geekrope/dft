@@ -1,0 +1,27 @@
+Let $f:\mathbb{R} \to \mathbb{C}$ be a $2\pi$-periodic, integrable function.
+The Fourier coefficients of $f$ are defined by
+\[
+	\hat f(k)
+	=
+	\frac{1}{2\pi}\int_0^{2\pi} f(x)\,e^{-ikx} \dx{x},
+	\quad k \in \mathbb{Z}.
+\]
+
+The Fourier series of $f$ is given by
+\[
+	f(x)
+	\;=\;
+	\sum_{k\in\mathbb{Z}} \hat f(k)\,e^{ikx}
+\]
+
+For $2\pi$-periodic functions $f,g \colon \mathbb{R}\to\mathbb{C}$ we define the
+circular convolution by
+\begin{equation}
+	(f \ast g)(x)
+	\;=\;
+	\int_0^{2\pi} f(y)\,g(x-y) \dx{y}
+	\label{eq:convolution}
+\end{equation}
+
+The root of unity:
+\[\omega_N = e^{\frac{2\pi i}{N}}\]

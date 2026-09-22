@@ -1,0 +1,153 @@
+\begin{theorem} \label{FFT}
+	Let $y\in \C^N$ and $N$ is even. $K = N/2$. Let:
+	\[y^{(1)} = {(y_0, y_2, ..., y_{2K-2})}^T \quad y^{(2)} = {(y_1, y_3, ..., y_{2K-1})}^T\]
+	\[z^{(1)} = F_K^{-1} y^{(1)} \quad z^{(2)} = F_K^{-1} y^{(2)}\]
+
+	Then:
+	\[z_j = \frac{1}{\sqrt {2}} \left(z^{(1)}_j + \omega_N^{-j} z^{(2)}_j\right) \; \forall j\in \{0, \dots, K - 1\}\]
+	\[z_{j+K} = \frac{1}{\sqrt {2}} \left(z^{(1)}_j - \omega_N^{-j} z^{(2)}_j\right) \; \forall j\in \{0, \dots, K - 1\}\]
+	where $z = F_N^{-1}y$
+\end{theorem}
+\begin{proof}
+	\begin{equation}
+		\begin{aligned}
+			z_j
+			= \frac{1}{\sqrt N} \sum_{k=0}^{N-1} \omega_N^{-kj}y_k
+			= \frac{1}{\sqrt N} \left(\sum_{\substack{k=0             \\ k\; \text{even}}}^{N-1} \omega_N^{-kj}y_k
+			+ \sum_{\substack{k=0                                     \\ k\; \text{odd}}}^{N-1} \omega_N^{-kj}y_k \right)
+			 & =                                                      \\ \frac{1}{\sqrt N} \left(\sum_{k=0}^{K-1} \omega_N^{-2kj}y_{2k}
+			+ \sum_{k=0}^{K-1} \omega_N^{-{(2k+1)}j}y_{2k+1} \right)
+			 & \underset{\text{Lemma}~\ref{lm:roots of unity fft}}{=} \\ \frac{1}{\sqrt N} \left(\sum_{k=0}^{K-1} \omega_K^{-kj}y_{2k}
+			+ \omega_N^{-j}\sum_{k=0}^{K-1} \omega_K^{-kj}y_{2k+1} \right)
+			 & =                                                      \\ \frac{1}{\sqrt 2\sqrt K} \left(\sum_{k=0}^{K-1} \omega_K^{-kj}y_{2k}
+			+ \omega_N^{-j}\sum_{k=0}^{K-1} \omega_K^{-kj}y_{2k+1} \right)
+		\end{aligned} \label{eq:FFT raw}
+	\end{equation}
+
+	For $j\in \{0, \dots, K-1\}$ we get the claim immediately. We now focus on the case, when $j = j' + K \in \{K, \dots, N-1\}$. The equation \eqref{eq:FFT raw} becomes:
+	\[\begin{aligned}
+			\sqrt{2K}z_j
+			= \sum_{k=0}^{K-1} \omega_K^{-k(j'+K)}y_{2k} + \omega_N^{-(j'+K)}\sum_{k=0}^{K-1} \omega_K^{-k(j'+K)}y_{2k+1}
+			 & =                                                            \\ \sum_{k=0}^{K-1} \omega_K^{-kj'}y_{2k}
+			+ \omega_N^{-j'}\omega_N^{-K}\sum_{k=0}^{K-1} \omega_K^{-kj'}y_{2k+1}
+			 & \underset{\text{Lemma}~\ref{lm:roots of unity half spin}}{=} \\ \sum_{k=0}^{K-1} \omega_K^{-kj'}y_{2k} - \omega_N^{-j'}\sum_{k=0}^{K-1} \omega_K^{-kj'}y_{2k+1}
+		\end{aligned}\]
+	which proves the second part of the claim.
+\end{proof}
+By extending the idea of the idea of the Theorem~\ref{FFT} we formulate the following algorithm:
+
+\begin{algorithm} \label{alg:FFT} \hfill \break
+	\noindent \textbf{Input:} $y\in \C^N$, $N$ is a power of two, $n>1$
+
+	\noindent \textbf{Procedure:}
+
+	\textbf{if} $N>n$:
+
+	Get $z^{(1)}$, $z^{(2)}$ by calling Algorithm~\ref{alg:FFT} on $y^{(1)}$, $y^{(2)}$. This is well defined since $N/2$ is a power of two
+
+	\[z_j = \frac{1}{\sqrt {2}} \left(z^{(1)}_j + \omega_N^{-j} z^{(2)}_j\right) \; \forall j\in \{0, \dots, K - 1\}\]
+	\[z_{j+K} = \frac{1}{\sqrt {2}} \left(z^{(1)}_j - \omega_N^{-j} z^{(2)}_j\right) \; \forall j\in \{0, \dots, K - 1\}\]
+
+	\indent \indent \textbf{return} z
+
+	\textbf{else}:
+
+	\indent \indent \textbf{return} $F^{-1}y$ (see the expression \ref{eq:DFT})
+\end{algorithm}
+
+\newpage
+\section{Finite impulse response filters}
+\subsection{Convolution theorem}
+\begin{lemma} \label{lm:piecewise cts msb} Let $f:\R\to \R$ have countably many discontinuities. Then $f$ is measurable
+\end{lemma}
+\begin{proof}
+	\begin{enumerate}
+		\item Let $D \subset \R$ be the set of all discontinuities of $f$. We have that $D$ has countably many elements. For any set $M \in \curlyB$ we have the following:
+		      \begin{equation}
+			      \begin{aligned}
+				      f^{-1}(M)
+				       & = \left(f^{-1}(M) \cap D\right) \cup \left(f^{-1}(M) \setminus D\right)                                 \\
+				       & = \left(f^{-1}(M) \cap D\right) \cup \left({\left(\left.f\right|_{\R\setminus D}\right)}^{-1}(M)\right)
+			      \end{aligned} \label{eq:null set preimage split}
+		      \end{equation}
+
+		      We have $\left(f^{-1}(M) \cap D\right) \subset D$, so it is countable and hence is Borel measurable, $\left.f\right|_{\R\setminus D}$ is a measurable mapping since $\R\setminus D$ is a Borel set and the restriction is continuous on its domain. Thus, $f^{-1}(M)$ is the union of two measurable sets, so is measurable as well. That proves measurability of $f$.
+	\end{enumerate}
+\end{proof}
+\begin{remark}
+	The statement of the Lemma~\ref{lm:piecewise cts msb} can be relaxed to the set of discontinuities having measure zero.
+	Let $F$ be a generalized distribution function (monotonous and right continuous). Then the following mapping defines an outer measure:
+	\[\begin{aligned}
+			\mu^*:\curlyP(\R) & \to [0;\infty], A \mapsto                                                                                                            \\
+			                  & \inf\left\{\sum_{n=1}^{\infty} F(b_n) - F(a_n): A\subset \bigcup_{n=1}^{\infty} (a_n; b_n], \; a_n < b_n \; \forall n \in \N\right\}
+		\end{aligned}\]
+	The Lebesgue measure is $\mu = \mu^*\big|_\curlyB$ for $F(x) = x$. However we know that $\curlyB \subset \mathcal{L} := \{A\subset \R: A \; \text{is} \; \mu^* \; \text{meaurable}\}$. However we cannot guarantee $\curlyB = \mathcal{L}$ ($\mathcal{L}$ is a sigma algebra by Caratheodori restriction theorem)
+
+	Consider a set $N \subset \R$ with $\mu^*(N) = 0$. For any $B \subset \R$:
+	\[\mu^*(B) =\mu^*((B \cap N) \cup (B \cap N^C))
+		\leq \mu^*(B \cap N) + \mu^*(B \cap N^C)\]
+	by sigma subadditivity of $\mu^*$. Moreover by monotonicty of $\mu^*$ we have that $\mu^*(B\cap N) \leq \mu^*(N) = 0$, so $\mu^*(B \cap N^C) \geq \mu^*(B)$. By applying monotonicty again $\mu^*(B \cap N^C) \leq \mu^*(B)$, so $\mu^*(B \cap N^C) = \mu^*(B)$. By combining those results together we obtain $\mu^*(B) = \mu^*(B \cap N) + \mu^*(B \cap N^C)$, so $N \in \mathcal{M}$
+
+	Now take a look at \eqref{eq:null set preimage split}:
+	\[
+		f^{-1}(M)
+		= \left(f^{-1}(M) \cap D\right) \cup \left({\left(\left.f\right|_{\R\setminus D}\right)}^{-1}(M)\right)\]
+
+	The set $f^{-1}(M) \cap D \subset D$, so it is a null set and hence is in $\mathcal{L}$. Also we know that ${\left(\left.f\right|_{\R\setminus D}\right)}^{-1}(M) \subset \curlyB \subset \mathcal{L}$, which implies $f^{-1}(M) \subset \mathcal{L}$. Therefore $f$ is $\mathcal{L} \to \curlyB$ measurable.
+\end{remark}
+
+\begin{theorem}[Convolution theorem] \label{thm:convolution theorem}
+	Let $f, g:\R\to \R$ be $2\pi$ periodic piecewise continuous and bounded. Then:
+	\[\frac{1}{2\pi}\widehat{f\ast g}(k) = \hat{f}(k) \hat{g}(k)\]
+\end{theorem}
+\begin{proof}
+	\begin{equation}
+		\begin{aligned}
+			2\pi\cdot \widehat{f\ast g}(k)
+			 & = \int_{0}^{2\pi} f\ast g(x) e^{-ikx} \dx{x}                                                                               \\
+			 & \underset{\eqref{eq:convolution}}{=} \int_{0}^{2\pi} \left(\int_{0}^{2\pi} f(y)g(x-y) \dx{y} \right) \cdot e^{-ikx} \dx{x} \\
+			 & = \int_{0}^{2\pi} \int_{0}^{2\pi} f(y)g(x-y) e^{-ikx} \dx{y} \dx{x}
+		\end{aligned} \label{eq:conv thm coef def}
+	\end{equation}
+
+	Let $F(x,y) = f(y)g(x-y) e^{-ikx}$. We have that both $f, g$ are measurabe by Lemma~\ref{lm:piecewise cts msb} since they have finitely many discontinuities. Therefore $\real(F) = f(\pi_y(x,y))g(x-y)\cos(kx)$ and $\imag(F) = -f(\pi_y(x,y))g(x-y)\sin(kx)$ are $\curlyB_2 \to \curlyB$ measurable.
+	\[|\real(F(x, y))|, |\imag(F(x, y))| \leq |F(x, y)| = |f(y)g(x-y)| \leq C < \infty\]
+	since both $f$ and $g$ are bounded.
+	\[\begin{aligned}
+			\int_{{[0,2\pi]}^2} |\real(F)(x,y)| \dx{\lambda^2(x,y)}
+			 & \leq \int_{\mathbb{R}^2} C\cdot \ind_{{[0,2\pi]}^2}(x,y) \dx{\lambda^2(x,y)} \\
+			 & = C \lambda^2({[0,2\pi]}^2)
+			= 4\pi^2 C < \infty
+		\end{aligned}\]
+
+	The same holds for $\imag(F)$. Since the function $F$ is absolutely integrable on ${[0, 2\pi]}^2$ we can use Fubini's theorem. This theorem also ensures, that $\int_{0}^{2\pi} f(y)g(x-y) e^{-ikx} \dx{y}$ is measurable wherever the integral exist. Moreover, we can say that the integral exists for all $y$, since the integrand is uniformly bounded.
+	\[\begin{aligned}
+			\int_{0}^{2\pi} \int_{0}^{2\pi} F(x,y) \dx{y} \dx{x}
+			 & = \int_{0}^{2\pi} \int_{0}^{2\pi} F(x,y) \dx{x} \dx{y}
+			\\ & = \int_{0}^{2\pi} \int_{0}^{2\pi} f(y)g(x-y) e^{-iky}e^{-ik(x-y)} \dx{x} \dx{y}
+			\\ & = \int_{0}^{2\pi} f(y) e^{-iky} \int_{0}^{2\pi} g(x-y) e^{-ik(x-y)} \dx{x} \dx{y}
+		\end{aligned}\]
+
+	Do the substitution $t = x-y$, $\frac{\partial t}{\partial x} = 1$ (this substitution is a diffeomorphism as a mapping $\Phi:[0;2\pi]\to [-y, 2\pi - y], \; x\mapsto x-y$ with $|\det(\Jac{\Phi(x)})| = 1$)
+	\[\begin{aligned}
+			\int_{0}^{2\pi} f(y) e^{-iky} \int_{0}^{2\pi} g(x-y) e^{-ik(x-y)} \dx{x} \dx{y}
+			 & = \\ \int_{0}^{2\pi} f(y) e^{-iky} \int_{-y}^{2\pi-y}g(t) e^{-ikt} \dx{t} \dx{y}
+			 & = \\ \int_{0}^{2\pi} f(y) e^{-iky} \int_{0}^{2\pi}g(t) e^{-ikt} \dx{t} \dx{y}
+			 & = \\ 2\pi\int_{0}^{2\pi} f(y) e^{-iky} \hat{g}(k) \dx{y} = 4\pi^2\hat{g}(k) \hat{f}(k)\end{aligned}\]
+
+	Thus:
+	\[2\pi\widehat{f\ast g}(k)
+		= 4\pi^2\hat{g}(k) \hat{f}(k) \Rightarrow
+		\frac{1}{2\pi}\widehat{f\ast g}(k)
+		= \hat{g}(k) \hat{f}(k)\]
+\end{proof}
+
+\begin{theorem}[Discrete convolution theorem] \label{thm:discrete convolution theorem}
+	Let $x, y \in \R^n$. Then the following holds:
+
+	\[\frac{1}{\sqrt N}(F(x\circledast y)) = Fx \odot Fy\]
+	where $\circledast$ denotes the circular convolution, and $\odot$ is the component-wise multiplication
+\end{theorem}
+\begin{proof}
+	This is the direct analogy to the continuous case in Theorem~\ref{thm:convolution theorem}
+\end{proof}

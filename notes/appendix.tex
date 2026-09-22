@@ -1,0 +1,69 @@
+\subsection{Notch filter impulse response \faTrash}
+We perform the long division of the numerator and denominator:
+\begin{align*}
+	z^{-2} - (e^{-i\omega} + e^{i\omega})z^{-1} + 1
+	= \frac{1}{r^2}(r^2z^{-2} - r(e^{-i\omega} + e^{i\omega})z^{-1} + 1) & \,+ \\ \frac{(e^{-i\omega} + e^{i\omega})z^{-1}}{r} - \frac{1}{r^2} - (e^{-i\omega} + e^{i\omega})z^{-1} + 1
+\end{align*}
+so the transfer function becomes:
+\begin{align*}
+	H(z)
+	 & = \frac{1}{r^2} + \frac{\frac{(e^{-i\omega} + e^{i\omega})z^{-1}}{r} - \frac{1}{r^2} - (e^{-i\omega} + e^{i\omega})z^{-1} + 1}{r^2z^{-2} - r(e^{-i\omega} + e^{i\omega})z^{-1} + 1}
+	\\ &= \frac{1}{r^2} + \frac{(e^{-i\omega} + e^{i\omega})\left(\frac{1}{r} - 1\right)z^{-1} - \frac{1}{r^2} + 1}{(rz^{-1} - e^{i\omega})(rz^{-1} - e^{-i\omega})}
+\end{align*}
+
+Using the partial fraction expansion discussed in Lemma~\ref{lm:partial fraction}:
+\begin{align*}
+	H(z)
+	 & = \frac{1}{r^2} + \frac{A}{rz^{-1} - e^{i\omega}} + \frac{B}{rz^{-1} - e^{-i\omega}}
+	\\ &= \frac{1}{r^2} + \frac{A(rz^{-1} - e^{-i\omega}) + B(rz^{-1} - e^{i\omega})}{(rz^{-1} - e^{i\omega})(rz^{-1} - e^{-i\omega})}
+\end{align*}
+
+We get the following equation:
+\[
+	A(rz^{-1} - e^{-i\omega}) + B(rz^{-1} - e^{i\omega})
+	= (e^{-i\omega} + e^{i\omega})\left(\frac{1}{r} - 1\right)z^{-1} - \frac{1}{r^2} + 1\]
+\[
+	r(A+B)z^{-1} - (Ae^{-i\omega} + Be^{i\omega})
+	= (e^{-i\omega} + e^{i\omega})\left(\frac{1}{r} - 1\right)z^{-1} - \frac{1}{r^2} + 1\]
+
+Which result in the system of equation:
+\[\begin{cases}
+		r(A+B) = (e^{-i\omega} + e^{i\omega})\left(\frac{1}{r} - 1\right) \\
+		Ae^{-i\omega} + Be^{i\omega} = 1 - \frac{1}{r^2}
+	\end{cases}\]
+\[
+	B = (e^{-i\omega} + e^{i\omega})\left(\frac{1}{r^2} - \frac{1}{r}\right) - A\]
+\begin{align*}
+	Ae^{-i\omega} + Be^{i\omega}
+	 & = Ae^{-i\omega} +  \left((e^{-i\omega} + e^{i\omega})\left(\frac{1}{r^2} - \frac{1}{r}\right) - A\right)e^{i\omega}
+	\\ &= A(e^{-i\omega} - e^{i\omega}) + (1 + e^{2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right)
+\end{align*}
+\[
+	A(e^{-i\omega} - e^{i\omega}) + (1 + e^{2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right) = 1 - \frac{1}{r^2} \]
+\[
+	A(e^{-i\omega} - e^{i\omega}) = 1 - \frac{1}{r^2} - (1 + e^{2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right)\]
+\[
+	A
+	= \frac{1 - \frac{1}{r^2} - (1 + e^{2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right)}{e^{-i\omega} - e^{i\omega}}
+	= \frac{1 - \frac{1}{r^2} - (1 + e^{2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right)}{e^{-i\omega} - e^{i\omega}} \]
+\begin{align*}
+	B
+	 & = (e^{-i\omega} + e^{i\omega})\left(\frac{1}{r^2} - \frac{1}{r}\right) - \frac{1 - \frac{1}{r^2} - (1 + e^{2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right)}{e^{-i\omega} - e^{i\omega}}
+	\\ &= \frac{(e^{-2i\omega} - e^{2i\omega})\left(\frac{1}{r^2} - \frac{1}{r}\right)}{e^{-i\omega} - e^{i\omega}} - \frac{1 - \frac{1}{r^2} - (1 + e^{2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right)}{e^{-i\omega} - e^{i\omega}}
+	\\ &= \frac{1 - \frac{1}{r^2} + (1 + e^{-2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right)}{e^{-i\omega} - e^{i\omega}}
+\end{align*}
+
+\begin{center}
+	\framebox{
+		$A = \frac{1 - \frac{1}{r^2} - (1 + e^{2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right)}{e^{-i\omega} - e^{i\omega}} \quad B = \frac{1 - \frac{1}{r^2} + (1 + e^{-2i\omega}) \left(\frac{1}{r^2} - \frac{1}{r}\right)}{e^{-i\omega} - e^{i\omega}}$}
+\end{center}
+
+Now we are able to compute the inverse transform using the fact that
+\[a^n u[n] \ztransform \frac{1}{1-az^{-1}}\]
+\[\delta[n] \ztransform 1\]
+\begin{align*}
+	H(Z)
+	 & = \frac{1}{r^2} + \frac{Ae^{-i\omega}}{re^{-i\omega}z^{-1} - 1} + \frac{Be^{i\omega}}{re^{i\omega}z^{-1} - 1}
+	\\ & \iztransform \frac{1}{r^2}
+	\delta[n] - Ar^ne^{-i\omega(n+1)}u[n] - Br^ne^{i\omega(n+1)}u[n]
+\end{align*}

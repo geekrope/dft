@@ -1,0 +1,163 @@
+\renewcommand{\arg}{\sphericalangle}
+
+\subsection{Group delay}
+This subsection solves the Exercise 5.57~\cite{oppenheim2010discrete}. Consider the signal:
+\[x[n] = s[n] \cos(\omega_0 n)\]
+which has the following z-transform at $e^{i\omega}$:
+\begin{equation}
+    \begin{aligned}
+        X(e^{i\omega})
+        = \sum_{n = -\infty}^{\infty} s[n] \cos(\omega_0 n) e^{-i\omega n}
+         & = \sum_{n = -\infty}^{\infty} s[n] \cdot \frac{e^{i\omega_0 n} + e^{-i\omega_0 n}}{2} \cdot e^{-i\omega n}
+        \\ &= \sum_{n = -\infty}^{\infty} s[n] \cdot \frac{e^{i(-\omega + \omega_0) n} + e^{i(-\omega - \omega_0) n}}{2}
+        \\ &\overset{*}{=} \sum_{n = -\infty}^{\infty} \frac{s[n]}{2} e^{-i(\omega - \omega_0) n} + \sum_{n = -\infty}^{\infty} \frac{s[n]}{2} e^{-i(\omega + \omega_0) n}
+        \\ &= \frac{1}{2} (S(e^{i(\omega - \omega_0)}) + S(e^{i(\omega + \omega_0)}))
+    \end{aligned}
+    \label{eq:harmonic signal expansion}
+\end{equation}
+where we assume that the Fourier transform of $s[n]$ exists, so that in the step $*$ we are sure that both sums exist.
+
+\begin{enumerate}[label = Assumption \arabic{enumi}, align = left]
+    \item \label{eq:real signal assumption} $s[n]$ and $y[n]$ are real.
+    \item \label{eq:concentration assumption} $S(e^{-i\omega}) = 0, \; |\omega| > \Delta$ for some small $\Delta:\Delta \ll \omega_0, \Delta \ll \pi - \omega_0$ \footnote{Those two inequalities ensure that the signal is spread enough so that it does not overlap with itself}
+\end{enumerate}
+
+\begin{enumerate}
+    \item \label{pt:phase step} Consider the phase response as in Figure~\ref{fig:phase response shelf} and $|H(e^{i\omega})| = 1$.
+          \begin{figure}[ht!]
+              \centering
+              \begin{tikzpicture}
+                  \draw[->] (0, -4) -- (0, 4) node[right] {$\arg H(e^{i\omega})$};
+                  \draw[->] (-4, 0) -- (4, 0) node[above] {$\omega$};
+
+                  \draw (-3.14, -0.1) -- (-3.14, 0.1) node[above] {$-\pi$};
+                  \draw (3.14, -0.1) -- (3.14, 0.1) node[above] {$\pi$};
+                  \draw (0, 2) node[right] {$\phi_0$};
+                  \draw (0, -2) node[left] {$-\phi_0$};
+
+                  \draw[red, thick] (-3.14, 2) -- (0, 2) --  (0, -2) -- (3.14, -2);
+
+              \end{tikzpicture}
+              \caption{}
+              \label{fig:phase response shelf}
+          \end{figure}
+
+          \begin{enumerate}[align = left]
+              \item[``$\omega < 0$'':] \hfill
+
+                    We have that $\omega - \omega_0 < -\omega_0 < -\Delta$, so by the \ref{eq:concentration assumption} we have that:
+                    \[X(e^{i\omega}) = \frac{1}{2} S(e^{i(\omega + \omega_0)})\]
+
+                    Thus:
+                    \[Y(\omega)
+                        = H(\omega) X(\omega)
+                        = \frac{1}{2} e^{i\phi_0} S(e^{i(\omega + \omega_0)})\]
+              \item[``$\omega \geq 0$'':] \hfill
+
+                    We have that $\omega + \omega_0 > \omega_0 > \Delta$, so by the \ref{eq:concentration assumption} we have that:
+                    \[X(e^{i\omega}) = \frac{1}{2} S(e^{i(\omega - \omega_0)})\]
+
+                    Thus:
+                    \[Y(\omega)
+                        = H(\omega) X(\omega)
+                        = \frac{1}{2} e^{i\phi_0} S(e^{i(\omega - \omega_0)})\]
+          \end{enumerate}
+
+          We take the inverse Fourier transform:
+          \begin{align*}
+              2\pi \cdot y[k]
+               & =
+              \int_{-\pi}^{\pi} Y(\omega) e^{i\omega k} \dx{\omega}
+              \\ &= \frac{1}{2} \left(
+              \int_{-\pi}^{0} e^{i\phi_0} S(e^{i(\omega + \omega_0)}) e^{i\omega k} \dx{\omega} +
+              \int_{0}^{\pi} e^{-i\phi_0} S(e^{i(\omega - \omega_0)}) e^{i\omega k} \dx{\omega} \right)
+              \\ &\overset{*}{=} \frac{1}{2} \left(
+              \int_{-\pi + \omega_0}^{\omega_0} e^{i\phi_0} S(e^{i\omega}) e^{i\omega k} e^{-i \omega_0 k} \dx{\omega} +
+              \int_{-\omega_0}^{\pi - \omega_0} e^{-i\phi_0} S(e^{i\omega}) e^{i\omega k} e^{i\omega_0 k} \dx{\omega} \right)
+              \\ &= \frac{1}{2} \left(
+              e^{-i(\omega_0 k - \phi_0)} \int_{-\pi + \omega_0}^{\omega_0}S(e^{i\omega}) e^{i\omega k} \dx{\omega} +
+              e^{i(\omega_0 k - \phi_0)} \int_{-\omega_0}^{\pi - \omega_0}  S(e^{i\omega}) e^{i\omega k} \dx{\omega} \right)
+          \end{align*}
+          assuming $\Delta$ is small enough so that $\Delta \leq \pi - \omega_0$ we obtain that both integrals include the entire interval where $S(e^{i\omega})$ is non-zero hence we can extend them to $[-\pi, \pi]$:
+          \begin{align*}
+              \frac{1}{2} & \left(
+              e^{-i(\omega_0 k - \phi_0)} \int_{-\pi + \omega_0}^{\omega_0}S(e^{i\omega}) e^{i\omega k} \dx{\omega} +
+              e^{i(\omega_0 k - \phi_0)} \int_{-\omega_0}^{\pi - \omega_0}  S(e^{i\omega}) e^{i\omega k} \dx{\omega} \right)
+              \\ &= \frac{1}{2} \left(e^{-i(\omega_0 k - \phi_0)} + e^{i(\omega_0 k - \phi_0)} \right) \int_{-\pi}^{\pi}  S(e^{i\omega}) e^{i\omega k} \dx{\omega}
+              = \frac{1}{2} \cdot 2\cos(\omega_0 k - \phi_0) \cdot 2\pi \cdot s[n]
+          \end{align*}
+          dividing both sides by $2\pi$ we get:
+          \[y[k] = s[k] \cos(\omega_0 k - \phi_0)\]
+    \item \label{pt:phase step inclined} Consider the phase response as in Figure~\ref{fig:phase response shelf} and $|H(e^{i\omega})| = 1$.
+          \begin{figure}[ht!]
+              \centering
+              \begin{tikzpicture}
+                  \draw[->] (0, -4) -- (0, 4) node[right] {$\arg H(e^{i\omega})$};
+                  \draw[->] (-4, 0) -- (4, 0) node[above] {$\omega$};
+
+                  \draw (-3.14, -0.1) -- (-3.14, 0.1) node[above] {$-\pi$};
+                  \draw (3.14, -0.1) -- (3.14, 0.1) node[above] {$\pi$};
+                  \draw (0, 2) node[right] {$\phi_0$};
+                  \draw (0, -2) node[left] {$-\phi_0$};
+
+                  \draw[red, thick] (-3.14, 3) -- (0, 2) --  (0, -2) -- (3.14, -3) node[black, below] {slope $-n_d$};
+                  \draw[dashed] (2, {-2 - 2 / 3.14}) -- (0, {-2 - 2 / 3.14}) node[left] {$-\phi_1$};
+                  \draw[dashed] (2, {-2 - 2 / 3.14}) -- (2, 0) node[above] {$\omega_0$};
+              \end{tikzpicture}
+              \caption{}
+              \label{fig:phase response inclined shelf}
+          \end{figure}
+
+          Thus:
+          \[H(\omega) =
+              \begin{cases}
+                  \phi_0 - n_d \omega, -\pi \leq \omega \leq 0 \\
+                  -\phi_0  - n_d \omega, 0 < \omega \leq \pi
+              \end{cases}\]
+
+          Using the result from part~\ref{pt:phase step}:
+          \[Y(\omega)
+              = \begin{cases}
+                  \frac{1}{2} e^{i(\phi_0 - n_d \omega)} S(e^{i(w + \omega_0)}), -\pi \leq \omega \leq 0 \\
+                  \frac{1}{2} e^{i(-\phi_0 - n_d \omega)} S(e^{i(w + \omega_0)}), 0 < \omega \leq \pi
+              \end{cases}\]
+
+          By integrating the lower and upper halves of unit circle we get:
+          \begin{itemize}
+              \item Lower:
+                    \begin{align*}
+                        \int_{-\pi}^{0} Y(\omega) e^{i\omega k}  \dx{\omega}
+                         & = \frac{1}{2} \int_{-\pi}^{0} e^{i(\phi_0 - n_d \omega)} S(e^{i(\omega + \omega_0)}) e^{i\omega k} \dx{\omega}
+                        \\ &\overset{*}{=} \frac{1}{2} \int_{-\pi + \omega_0}^{\omega_0} e^{i\phi_0} S(e^{i\omega}) e^{-n_d (\omega - \omega_0)} e^{i(\omega - \omega_0) k} \dx{\omega}
+                        \\ &= \frac{1}{2} \int_{-\pi + \omega_0}^{\omega_0} e^{i(\phi_0 + n_d \omega_0 - \omega_0 k)} S(e^{i\omega}) e^{-n_d \omega} e^{i\omega k} \dx{\omega}
+                        \\ &\overset{**}{=} \frac{1}{2} e^{i(\phi_0 + n_d \omega_0 - \omega_0 k)} \int_{-\pi}^{\pi} S(e^{i\omega}) e^{-n_d \omega} e^{i\omega k}  \dx{\omega}
+                        \\ &\overset{***}{=} \frac{1}{2} e^{i(\phi_0 + n_d \omega_0 - \omega_0 k)} \cdot 2\pi \cdot s[n - n_d]  \dx{\omega}
+                    \end{align*}
+                    where in $*$ we used the change of variables $\omega \to \omega - \omega_0$, in $**$ we used the assumption~\ref{eq:concentration assumption} and in $***$ we used the time shift property:
+                    \[S(e^{i\omega}) e^{-n_d \omega}
+                        = \sum_{n = -\infty}^{\infty} s[n] e^{-i\omega n} e^{-n_d \omega}
+                        = \sum_{n = -\infty}^{\infty} s[n] e^{-i\omega (n+n_d)}
+                        \overset{\dagger}{=} \sum_{n = -\infty}^{\infty} s[n - n_d] e^{-i\omega n}\]
+                    where in $\dagger$ we did the change of variables $n \to n + n_d$.
+              \item Doing the same procedure as above we get:
+                    \[\int_{0}^{\pi} Y(\omega) e^{i\omega k}
+                        = \frac{1}{2} e^{-i(\phi_0 + n_d \omega_0 - \omega_0 k)} \cdot 2\pi \cdot s[n - n_d]\]
+          \end{itemize}
+
+          By summing those two equation and dividing by $2\pi$ we obtain:
+          \[y[n] = s[n - n_d] \cos(\omega_0 n - \phi_0 - n_d \omega_0)\]
+            and by using line equation to express $-\phi_1 = -\phi_0 -\omega_0 n_d$ we obtain the equivalent form:
+            \begin{equation} \label{eq:phase shift harmonic}
+                y[n] = s[n - n_d] \cos(\omega_0 n - \phi_1)
+            \end{equation}
+
+    \item Since $x[n]$ is narrowband we have that $X(\omega)$ is non-zero in the neighbourhood $\omega_0 \pm \Delta$ and $-\omega_0 \pm \Delta$ so for the output signal we care only about those parts as $Y(\omega) = X(\omega) H(\omega)$. Using the basic property of z-transform $\bar{x} \ztransform \overline{X(\bar{z})}$ we get that for the real valued signal the phase is inverted when the argument is conjugated as $x = \bar{x} \ztransform \overline{X(\bar{z})} \Rightarrow X(\bar{z}) = \overline{X(\bar{\bar{z}})} = \overline{X(z)}$. As we assume both signals $x$ and $y$ to be real valued this property automatically holds for $H$
+    
+    In the neighbourhood of $\omega_0$ the linear approximation takes the form:
+    \[\arg H(\omega) \approx \arg H(\omega_0) + \partial_\omega(\arg H)(\omega) \cdot (\omega - \omega_0)\]
+
+    Define $\tau_{gr} = -\partial_\omega(\arg H) (\omega)$ and $\tau_{ph} = -(1 / \omega_0) \arg H(\omega_0)$. In terms of the Figure~\ref{fig:phase response inclined shelf} it becomes $-\phi_1 = \arg H(\omega_0) = -\omega_0 \tau_{ph}$ and $\text{slope} = -n_d = -\tau_{gr} \Rightarrow n_d = \tau_{gr}$. Plugging this into \eqref{eq:phase shift harmonic}:
+    \[y[n] = s[n - n_d] \cos(\omega_0 n - \phi_1)
+    = s[n - \tau_{gr}] \cos(\omega_0 n - \omega_0 \tau_{ph})
+    = s[n - \tau_{gr}] \cos(\omega_0 (n -  \tau_{ph}))\]
+\end{enumerate}
