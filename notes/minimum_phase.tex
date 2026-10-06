@@ -1,4 +1,5 @@
 \renewcommand{\arg}{\sphericalangle}
+\newcommand{\grd}{\operatorname{grd}} % group delay
 
 \subsection{Group delay}
 This subsection solves the Exercise 5.57~\cite{oppenheim2010discrete}. Consider the signal:
@@ -84,7 +85,7 @@ where we assume that the Fourier transform of $s[n]$ exists, so that in the step
               e^{-i(\omega_0 k - \phi_0)} \int_{-\pi + \omega_0}^{\omega_0}S(e^{i\omega}) e^{i\omega k} \dx{\omega} +
               e^{i(\omega_0 k - \phi_0)} \int_{-\omega_0}^{\pi - \omega_0}  S(e^{i\omega}) e^{i\omega k} \dx{\omega} \right)
               \\ &= \frac{1}{2} \left(e^{-i(\omega_0 k - \phi_0)} + e^{i(\omega_0 k - \phi_0)} \right) \int_{-\pi}^{\pi}  S(e^{i\omega}) e^{i\omega k} \dx{\omega}
-              = \frac{1}{2} \cdot 2\cos(\omega_0 k - \phi_0) \cdot 2\pi \cdot s[n]
+              = \frac{1}{2} \cdot 2\cos(\omega_0 k - \phi_0) \cdot 2\pi \cdot s[k]
           \end{align*}
           dividing both sides by $2\pi$ we get:
           \[y[k] = s[k] \cos(\omega_0 k - \phi_0)\]
@@ -109,7 +110,7 @@ where we assume that the Fourier transform of $s[n]$ exists, so that in the step
           \end{figure}
 
           Thus:
-          \[H(\omega) =
+          \[\arg H(\omega) =
               \begin{cases}
                   \phi_0 - n_d \omega, -\pi \leq \omega \leq 0 \\
                   -\phi_0  - n_d \omega, 0 < \omega \leq \pi
@@ -118,8 +119,8 @@ where we assume that the Fourier transform of $s[n]$ exists, so that in the step
           Using the result from part~\ref{pt:phase step}:
           \[Y(\omega)
               = \begin{cases}
-                  \frac{1}{2} e^{i(\phi_0 - n_d \omega)} S(e^{i(w + \omega_0)}), -\pi \leq \omega \leq 0 \\
-                  \frac{1}{2} e^{i(-\phi_0 - n_d \omega)} S(e^{i(w + \omega_0)}), 0 < \omega \leq \pi
+                  \frac{1}{2} e^{i(\phi_0 - n_d \omega)} S(e^{i(\omega + \omega_0)}), -\pi \leq \omega \leq 0 \\
+                  \frac{1}{2} e^{i(-\phi_0 - n_d \omega)} S(e^{i(\omega - \omega_0)}), 0 < \omega \leq \pi
               \end{cases}\]
 
           By integrating the lower and upper halves of unit circle we get:
@@ -128,36 +129,142 @@ where we assume that the Fourier transform of $s[n]$ exists, so that in the step
                     \begin{align*}
                         \int_{-\pi}^{0} Y(\omega) e^{i\omega k}  \dx{\omega}
                          & = \frac{1}{2} \int_{-\pi}^{0} e^{i(\phi_0 - n_d \omega)} S(e^{i(\omega + \omega_0)}) e^{i\omega k} \dx{\omega}
-                        \\ &\overset{*}{=} \frac{1}{2} \int_{-\pi + \omega_0}^{\omega_0} e^{i\phi_0} S(e^{i\omega}) e^{-n_d (\omega - \omega_0)} e^{i(\omega - \omega_0) k} \dx{\omega}
-                        \\ &= \frac{1}{2} \int_{-\pi + \omega_0}^{\omega_0} e^{i(\phi_0 + n_d \omega_0 - \omega_0 k)} S(e^{i\omega}) e^{-n_d \omega} e^{i\omega k} \dx{\omega}
-                        \\ &\overset{**}{=} \frac{1}{2} e^{i(\phi_0 + n_d \omega_0 - \omega_0 k)} \int_{-\pi}^{\pi} S(e^{i\omega}) e^{-n_d \omega} e^{i\omega k}  \dx{\omega}
-                        \\ &\overset{***}{=} \frac{1}{2} e^{i(\phi_0 + n_d \omega_0 - \omega_0 k)} \cdot 2\pi \cdot s[n - n_d]  \dx{\omega}
+                        \\ &\overset{*}{=} \frac{1}{2} \int_{-\pi + \omega_0}^{\omega_0} e^{i\phi_0} S(e^{i\omega}) e^{-i n_d (\omega - \omega_0)} e^{i(\omega - \omega_0) k} \dx{\omega}
+                        \\ &= \frac{1}{2} \int_{-\pi + \omega_0}^{\omega_0} e^{i(\phi_0 + n_d \omega_0 - \omega_0 k)} S(e^{i\omega}) e^{-i n_d \omega} e^{i\omega k} \dx{\omega}
+                        \\ &\overset{**}{=} \frac{1}{2} e^{i(\phi_0 + n_d \omega_0 - \omega_0 k)} \int_{-\pi}^{\pi} S(e^{i\omega}) e^{-i n_d \omega} e^{i\omega k}  \dx{\omega}
+                        \\ &\overset{***}{=} \frac{1}{2} e^{i(\phi_0 + n_d \omega_0 - \omega_0 k)} \cdot 2\pi \cdot s[k - n_d]
                     \end{align*}
                     where in $*$ we used the change of variables $\omega \to \omega - \omega_0$, in $**$ we used the assumption~\ref{eq:concentration assumption} and in $***$ we used the time shift property:
-                    \[S(e^{i\omega}) e^{-n_d \omega}
-                        = \sum_{n = -\infty}^{\infty} s[n] e^{-i\omega n} e^{-n_d \omega}
+                    \[S(e^{i\omega}) e^{-i n_d \omega}
+                        = \sum_{n = -\infty}^{\infty} s[n] e^{-i\omega n} e^{-i n_d \omega}
                         = \sum_{n = -\infty}^{\infty} s[n] e^{-i\omega (n+n_d)}
                         \overset{\dagger}{=} \sum_{n = -\infty}^{\infty} s[n - n_d] e^{-i\omega n}\]
                     where in $\dagger$ we did the change of variables $n \to n + n_d$.
               \item Doing the same procedure as above we get:
                     \[\int_{0}^{\pi} Y(\omega) e^{i\omega k}
-                        = \frac{1}{2} e^{-i(\phi_0 + n_d \omega_0 - \omega_0 k)} \cdot 2\pi \cdot s[n - n_d]\]
+                        = \frac{1}{2} e^{-i(\phi_0 + n_d \omega_0 - \omega_0 k)} \cdot 2\pi \cdot s[k - n_d]\]
           \end{itemize}
 
           By summing those two equation and dividing by $2\pi$ we obtain:
-          \[y[n] = s[n - n_d] \cos(\omega_0 n - \phi_0 - n_d \omega_0)\]
-            and by using line equation to express $-\phi_1 = -\phi_0 -\omega_0 n_d$ we obtain the equivalent form:
-            \begin{equation} \label{eq:phase shift harmonic}
-                y[n] = s[n - n_d] \cos(\omega_0 n - \phi_1)
-            \end{equation}
+          \[y[k] = s[k - n_d] \cos(\omega_0 k - \phi_0 - n_d \omega_0)\]
+          and by using line equation to express $-\phi_1 = -\phi_0 -\omega_0 n_d$ we obtain the equivalent form:
+          \begin{equation} \label{eq:phase shift harmonic}
+              y[n] = s[n - n_d] \cos(\omega_0 n - \phi_1)
+          \end{equation}
 
     \item Since $x[n]$ is narrowband we have that $X(\omega)$ is non-zero in the neighbourhood $\omega_0 \pm \Delta$ and $-\omega_0 \pm \Delta$ so for the output signal we care only about those parts as $Y(\omega) = X(\omega) H(\omega)$. Using the basic property of z-transform $\bar{x} \ztransform \overline{X(\bar{z})}$ we get that for the real valued signal the phase is inverted when the argument is conjugated as $x = \bar{x} \ztransform \overline{X(\bar{z})} \Rightarrow X(\bar{z}) = \overline{X(\bar{\bar{z}})} = \overline{X(z)}$. As we assume both signals $x$ and $y$ to be real valued this property automatically holds for $H$
-    
-    In the neighbourhood of $\omega_0$ the linear approximation takes the form:
-    \[\arg H(\omega) \approx \arg H(\omega_0) + \partial_\omega(\arg H)(\omega) \cdot (\omega - \omega_0)\]
 
-    Define $\tau_{gr} = -\partial_\omega(\arg H) (\omega)$ and $\tau_{ph} = -(1 / \omega_0) \arg H(\omega_0)$. In terms of the Figure~\ref{fig:phase response inclined shelf} it becomes $-\phi_1 = \arg H(\omega_0) = -\omega_0 \tau_{ph}$ and $\text{slope} = -n_d = -\tau_{gr} \Rightarrow n_d = \tau_{gr}$. Plugging this into \eqref{eq:phase shift harmonic}:
-    \[y[n] = s[n - n_d] \cos(\omega_0 n - \phi_1)
-    = s[n - \tau_{gr}] \cos(\omega_0 n - \omega_0 \tau_{ph})
-    = s[n - \tau_{gr}] \cos(\omega_0 (n -  \tau_{ph}))\]
+          In the neighbourhood of $\omega_0$ the linear approximation takes the form:
+          \[\arg H(\omega) \approx \arg H(\omega_0) + \partial_\omega(\arg H)(\omega) \cdot (\omega - \omega_0)\]
+
+          Define $\tau_{gr} = -\partial_\omega(\arg H) (\omega)$ and $\tau_{ph} = -(1 / \omega_0) \arg H(\omega_0)$. In terms of the Figure~\ref{fig:phase response inclined shelf} it becomes $-\phi_1 = \arg H(\omega_0) = -\omega_0 \tau_{ph}$ and $\text{slope} = -n_d = -\tau_{gr} \Rightarrow n_d = \tau_{gr}$. Plugging this into \eqref{eq:phase shift harmonic}:
+          \begin{equation} \label{eq:group delay}
+              y[n] = s[n - n_d] \cos(\omega_0 n - \phi_1)
+              = s[n - \tau_{gr}] \cos(\omega_0 n - \omega_0 \tau_{ph})
+              = s[n - \tau_{gr}] \cos(\omega_0 (n -  \tau_{ph}))
+          \end{equation}
 \end{enumerate}
+
+\subsection{All-pass}
+\begin{definition}
+    We define a single pole all-pass system:
+    \[H_{ap}(z) = \frac{z^{-1} - \bar{a}}{1 - az^{-1}}\]
+\end{definition}
+\begin{lemma}[Properties of all-pass systems]
+    Suppose $a = r e^{i \theta}$, where $0 \leq r < 1$. Then:
+    \begin{enumerate}
+        \item $|H_{ap}(e^{i\omega})| = 1 \; \forall \omega \in [0, 2\pi]$
+        \item \label{lem:allpass group delay} $\grd(\omega) = \frac{1 - r^2}{1 - 2r \cos (\omega - \theta) + r^2}$
+    \end{enumerate}
+\end{lemma}
+\begin{proof} \hfill
+    \begin{enumerate}
+        \item
+              \[\frac{{(e^{i\omega})}^{-1} - \bar{a}}{1 - a{(e^{i\omega})}^{-1}}
+                  = \frac{e^{-i\omega} - \bar{a}}{1 - a e^{-i\omega}}
+                  = e^{-i\omega}\frac{1 - \bar{a} e^{i\omega}}{1 - a e^{-i\omega}}\]
+              Note that:
+              \[\overline{1 - \bar{a} e^{i\omega}} = 1 - a e^{-i\omega}\]
+              so:
+              \[\left|\frac{1 - \bar{a} e^{i\omega}}{1 - a e^{-i\omega}}\right| = 1\]
+              thus:
+              \[\left|e^{-i\omega}\frac{1 - \bar{a} e^{i\omega}}{1 - a e^{-i\omega}}\right|
+                  =|e^{-i\omega}| \left|\frac{1 - \bar{a} e^{i\omega}}{1 - a e^{-i\omega}}\right|
+                  = 1\]
+        \item We compute:
+              \[\arg \left(\frac{{(e^{i\omega})}^{-1} - \bar{a}}{1 - a{(e^{i\omega})}^{-1}} \right)
+                  = \arg e^{-i\omega} + \arg \left(\frac{1 - \bar{a} e^{i\omega}}{1 - a e^{-i\omega}} \right)
+                  = \arg e^{-i\omega} + 2 \arg{(1 - \bar{a} e^{i\omega})}\]
+
+              Then:
+              \[1 - \bar{a} e^{i\omega}
+                  = 1 - r e^{-i \theta} e^{i\omega}
+                  = 1 - r \cos (\omega - \theta) - i r \sin(\omega - \theta)\]
+
+              Since $\real(1-\bar a e^{i\omega}) > 0$, the point lies in the right half-plane, where $\arg z = \arctan(\imag z / \real z)$:
+              \[\arg{(1 - \bar{a} e^{i\omega})}
+                  = \arctan \left(\frac{-r \sin(\omega - \theta)}{1 - r \cos (\omega - \theta)}\right)
+                  = -\arctan \left(\frac{r \sin(\omega - \theta)}{1 - r \cos (\omega - \theta)}\right)\]
+              hence:
+              \[\arg \left(\frac{{(e^{i\omega})}^{-1} - \bar{a}}{1 - a{(e^{i\omega})}^{-1}} \right)
+                  = -\omega - 2\arctan \left(\frac{r \sin(\omega - \theta)}{1 - r \cos (\omega - \theta)}\right)\]
+
+              Now we compute the group delay:
+              \begin{enumerate}[label = Step \arabic*., align = left]
+                  \item
+                        \begin{align*}
+                            \partial_{\omega} \left(\frac{r \sin(\omega - \theta)}{1 - r \cos (\omega - \theta)} \right)
+                             & = \frac{r \cos(\omega - \theta) \cdot (1 - r \cos(\omega - \theta)) - r\sin(\omega - \theta) \cdot r\sin(\omega - \theta)}{(1-r\cos(\omega - \theta))^2}
+                            \\ &= \frac{r \cos(\omega - \theta) - r^2 \cos^2(\omega - \theta) - r^2 \sin^2(\omega - \theta)}{(1-r\cos(\omega - \theta))^2}
+                            \\ &= \frac{r \cos(\omega - \theta) - r^2}{(1-r\cos(\omega - \theta))^2}
+                        \end{align*}
+                  \item
+                        \begin{align*}
+                            1 + \left(\frac{r \sin(\omega - \theta)}{1 - r \cos (\omega - \theta)} \right)^2
+                             & = 1 + \frac{r^2 \sin^2(\omega - \theta)}{1 - 2r \cos (\omega - \theta) + r^2 \cos^2 (\omega - \theta)}
+                            \\ &= \frac{1 - 2r \cos (\omega - \theta) + r^2 \cos^2 (\omega - \theta) + r^2 \sin^2(\omega - \theta)}{1 - 2r \cos (\omega - \theta) + r^2 \cos^2 (\omega - \theta)}
+                            \\ &= \frac{1 - 2r \cos (\omega - \theta) + r^2}{(1 - r \cos (\omega - \theta))^2}
+                        \end{align*}
+                  \item
+                        \begin{align*}
+                            \partial_{\omega} \arctan \left(\frac{r \sin(\omega - \theta)}{1 - r \cos (\omega - \theta)}\right)
+                             & = \frac{1}{1 + \left(\frac{r \sin(\omega - \theta)}{1 - r \cos (\omega - \theta)}\right)^2} \cdot \partial_{\omega} \left(\frac{r \sin(\omega - \theta)}{1 - r \cos (\omega - \theta)}\right)
+                            \\ &= \frac{(1 - r \cos (\omega - \theta))^2}{1 - 2r \cos (\omega - \theta) + r^2} \cdot \frac{r \cos(\omega - \theta) - r^2}{(1 - r\cos(\omega - \theta))^2}
+                            \\ &= \frac{r \cos(\omega - \theta) - r^2}{1 - 2r \cos (\omega - \theta) + r^2}
+                        \end{align*}
+                  \item
+                        \begin{align*}
+                            \partial_{\omega} \left( -\omega - 2\arctan \left(\frac{r \sin(\omega - \theta)}{1 - r \cos (\omega - \theta)}\right) \right)
+                             & = -1 - 2 \cdot \partial_{\omega} \arctan \left(\frac{r \sin(\omega - \theta)}{1 - r \cos (\omega - \theta)}\right)
+                            \\ &=-1 - \frac{2r \cos(\omega - \theta) - 2r^2}{1 - 2r \cos (\omega - \theta) + r^2}
+                            \\ &=\frac{r^2 - 1}{1 - 2r \cos (\omega - \theta) + r^2}
+                        \end{align*}
+              \end{enumerate}
+
+              Thus:
+              \[\grd(\omega) 
+              = - \partial_\omega{(\arg{H_{ap}(e^{i\omega})})} 
+              = \frac{1 - r^2}{1 - 2r \cos (\omega - \theta) + r^2}\]
+              which is non-negative since $0 \leq r < 1$, hence $-2r \cos(\omega - \theta) \geq -2r$, so:
+              \[1 - 2r \cos (\omega - \theta) + r^2 
+              \geq 1 - 2r + r^2
+              = (1 - r)^2 > 0\]
+    \end{enumerate}
+\end{proof}
+
+By cascading two all-pass filters with the conjugate poles we get:
+\[H_{ap}(z) 
+= \frac{z^{-1} - \bar{a}}{1 - az^{-1}} \frac{z^{-1} - a}{1 - \bar{a}z^{-1}}
+=  \frac{z^{-2} - (\bar{a} + a) z^{-1} + |a|^2}{1 - (\bar{a} + a) z^{-1} + |a|^2 z^{-2}}\]
+with all the real coefficients as $a + \bar{a} = 2\real(a)$
+
+By Lemma~\ref{lem:allpass group delay} we have that the group delay of the both parts is non-negative, hence the group delay of the whole system is non-negative as well as the phases add up. By Mean Value Theorem:
+\[\frac{\arg H_{ap}(e^{i\omega}) - \arg H_{ap}(e^{i \cdot 0})}{\omega}
+= \partial_{\omega} \arg H_{ap}(e^{i\omega'}) \leq 0\]
+for some $\omega' \in (0, \omega)$
+
+\[H_{ap}(1) = 
+\frac{1 - 2 \real(a) + |a|^2}{1 - 2\real{a} + |a|^2}
+= 1 \Rightarrow \arg H_{ap}(e^{i \cdot 0}) = 0\]
+thus:
+\[\arg H_{ap}(e^{i\omega}) = \omega \cdot \partial_{\omega} \arg H_{ap}(e^{i\omega'}) \leq 0 \; \forall \omega \in [0, \pi]\]

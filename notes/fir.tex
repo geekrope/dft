@@ -1,0 +1,193 @@
+\subsection{Convolution theorem}
+\begin{lemma} \label{lm:piecewise cts msb} Let $f:\R\to \R$ have countably many discontinuities. Then $f$ is measurable
+\end{lemma}
+\begin{proof}
+	\begin{enumerate}
+		\item Let $D \subset \R$ be the set of all discontinuities of $f$. We have that $D$ has countably many elements. For any set $M \in \curlyB$ we have the following:
+		      \begin{equation}
+			      \begin{aligned}
+				      f^{-1}(M)
+				       & = \left(f^{-1}(M) \cap D\right) \cup \left(f^{-1}(M) \setminus D\right)                                 \\
+				       & = \left(f^{-1}(M) \cap D\right) \cup \left({\left(\left.f\right|_{\R\setminus D}\right)}^{-1}(M)\right)
+			      \end{aligned} \label{eq:null set preimage split}
+		      \end{equation}
+
+		      We have $\left(f^{-1}(M) \cap D\right) \subset D$, so it is countable and hence is Borel measurable, $\left.f\right|_{\R\setminus D}$ is a measurable mapping since $\R\setminus D$ is a Borel set and the restriction is continuous on its domain. Thus, $f^{-1}(M)$ is the union of two measurable sets, so is measurable as well. That proves measurability of $f$.
+	\end{enumerate}
+\end{proof}
+\begin{remark}
+	The statement of the Lemma~\ref{lm:piecewise cts msb} can be relaxed to the set of discontinuities having measure zero.
+	Let $F$ be a generalized distribution function (monotonous and right continuous). Then the following mapping defines an outer measure:
+	\[\begin{aligned}
+			\mu^*:\curlyP(\R) & \to [0;\infty], A \mapsto                                                                                                            \\
+			                  & \inf\left\{\sum_{n=1}^{\infty} F(b_n) - F(a_n): A\subset \bigcup_{n=1}^{\infty} (a_n; b_n], \; a_n < b_n \; \forall n \in \N\right\}
+		\end{aligned}\]
+	The Lebesgue measure is $\mu = \mu^*\big|_\curlyB$ for $F(x) = x$. However we know that $\curlyB \subset \mathcal{L} := \{A\subset \R: A \; \text{is} \; \mu^* \; \text{meaurable}\}$. However we cannot guarantee $\curlyB = \mathcal{L}$ ($\mathcal{L}$ is a sigma algebra by Caratheodori restriction theorem)
+
+	Consider a set $N \subset \R$ with $\mu^*(N) = 0$. For any $B \subset \R$:
+	\[\mu^*(B) =\mu^*((B \cap N) \cup (B \cap N^C))
+		\leq \mu^*(B \cap N) + \mu^*(B \cap N^C)\]
+	by sigma subadditivity of $\mu^*$. Moreover by monotonicty of $\mu^*$ we have that $\mu^*(B\cap N) \leq \mu^*(N) = 0$, so $\mu^*(B \cap N^C) \geq \mu^*(B)$. By applying monotonicty again $\mu^*(B \cap N^C) \leq \mu^*(B)$, so $\mu^*(B \cap N^C) = \mu^*(B)$. By combining those results together we obtain $\mu^*(B) = \mu^*(B \cap N) + \mu^*(B \cap N^C)$, so $N \in \mathcal{M}$
+
+	Now take a look at \eqref{eq:null set preimage split}:
+	\[
+		f^{-1}(M)
+		= \left(f^{-1}(M) \cap D\right) \cup \left({\left(\left.f\right|_{\R\setminus D}\right)}^{-1}(M)\right)\]
+
+	The set $f^{-1}(M) \cap D \subset D$, so it is a null set and hence is in $\mathcal{L}$. Also we know that ${\left(\left.f\right|_{\R\setminus D}\right)}^{-1}(M) \subset \curlyB \subset \mathcal{L}$, which implies $f^{-1}(M) \subset \mathcal{L}$. Therefore $f$ is $\mathcal{L} \to \curlyB$ measurable.
+\end{remark}
+
+\begin{theorem}[Convolution theorem] \label{thm:convolution theorem}
+	Let $f, g:\R\to \R$ be $2\pi$ periodic piecewise continuous and bounded. Then:
+	\[\frac{1}{2\pi}\widehat{f\ast g}(k) = \hat{f}(k) \hat{g}(k)\]
+\end{theorem}
+\begin{proof}
+	\begin{equation}
+		\begin{aligned}
+			2\pi\cdot \widehat{f\ast g}(k)
+			 & = \int_{0}^{2\pi} f\ast g(x) e^{-ikx} \dx{x}                                                                               \\
+			 & \underset{\eqref{eq:convolution}}{=} \int_{0}^{2\pi} \left(\int_{0}^{2\pi} f(y)g(x-y) \dx{y} \right) \cdot e^{-ikx} \dx{x} \\
+			 & = \int_{0}^{2\pi} \int_{0}^{2\pi} f(y)g(x-y) e^{-ikx} \dx{y} \dx{x}
+		\end{aligned} \label{eq:conv thm coef def}
+	\end{equation}
+
+	Let $F(x,y) = f(y)g(x-y) e^{-ikx}$. We have that both $f, g$ are measurabe by Lemma~\ref{lm:piecewise cts msb} since they have finitely many discontinuities. Therefore $\real(F) = f(\pi_y(x,y))g(x-y)\cos(kx)$ and $\imag(F) = -f(\pi_y(x,y))g(x-y)\sin(kx)$ are $\curlyB_2 \to \curlyB$ measurable.
+	\[|\real(F(x, y))|, |\imag(F(x, y))| \leq |F(x, y)| = |f(y)g(x-y)| \leq C < \infty\]
+	since both $f$ and $g$ are bounded.
+	\[\begin{aligned}
+			\int_{{[0,2\pi]}^2} |\real(F)(x,y)| \dx{\lambda^2(x,y)}
+			 & \leq \int_{\mathbb{R}^2} C\cdot \ind_{{[0,2\pi]}^2}(x,y) \dx{\lambda^2(x,y)} \\
+			 & = C \lambda^2({[0,2\pi]}^2)
+			= 4\pi^2 C < \infty
+		\end{aligned}\]
+
+	The same holds for $\imag(F)$. Since the function $F$ is absolutely integrable on ${[0, 2\pi]}^2$ we can use Fubini's theorem. This theorem also ensures, that $\int_{0}^{2\pi} f(y)g(x-y) e^{-ikx} \dx{y}$ is measurable wherever the integral exist. Moreover, we can say that the integral exists for all $y$, since the integrand is uniformly bounded.
+	\[\begin{aligned}
+			\int_{0}^{2\pi} \int_{0}^{2\pi} F(x,y) \dx{y} \dx{x}
+			 & = \int_{0}^{2\pi} \int_{0}^{2\pi} F(x,y) \dx{x} \dx{y}
+			\\ & = \int_{0}^{2\pi} \int_{0}^{2\pi} f(y)g(x-y) e^{-iky}e^{-ik(x-y)} \dx{x} \dx{y}
+			\\ & = \int_{0}^{2\pi} f(y) e^{-iky} \int_{0}^{2\pi} g(x-y) e^{-ik(x-y)} \dx{x} \dx{y}
+		\end{aligned}\]
+
+	Do the substitution $t = x-y$, $\frac{\partial t}{\partial x} = 1$ (this substitution is a diffeomorphism as a mapping $\Phi:[0;2\pi]\to [-y, 2\pi - y], \; x\mapsto x-y$ with $|\det(\Jac{\Phi(x)})| = 1$)
+	\[\begin{aligned}
+			\int_{0}^{2\pi} f(y) e^{-iky} \int_{0}^{2\pi} g(x-y) e^{-ik(x-y)} \dx{x} \dx{y}
+			 & = \\ \int_{0}^{2\pi} f(y) e^{-iky} \int_{-y}^{2\pi-y}g(t) e^{-ikt} \dx{t} \dx{y}
+			 & = \\ \int_{0}^{2\pi} f(y) e^{-iky} \int_{0}^{2\pi}g(t) e^{-ikt} \dx{t} \dx{y}
+			 & = \\ 2\pi\int_{0}^{2\pi} f(y) e^{-iky} \hat{g}(k) \dx{y} = 4\pi^2\hat{g}(k) \hat{f}(k)\end{aligned}\]
+
+	Thus:
+	\[2\pi\widehat{f\ast g}(k)
+		= 4\pi^2\hat{g}(k) \hat{f}(k) \Rightarrow
+		\frac{1}{2\pi}\widehat{f\ast g}(k)
+		= \hat{g}(k) \hat{f}(k)\]
+\end{proof}
+
+\begin{theorem}[Discrete convolution theorem] \label{thm:discrete convolution theorem}
+	Let $x, y \in \R^n$. Then the following holds:
+
+	\[\frac{1}{\sqrt N}(F(x\circledast y)) = Fx \odot Fy\]
+	where $\circledast$ denotes the circular convolution, and $\odot$ is the component-wise multiplication
+\end{theorem}
+\begin{proof}
+	This is the direct analogy to the continuous case in Theorem~\ref{thm:convolution theorem}
+\end{proof}
+
+\subsection{Ideal LPF} \label{sec:ideal lpf}
+Using this knowledge we can derive an ideal low pass filter.
+\[z_i = \begin{cases} 0, \;i \in (k;n-k) \\ 1, \; \text{otherwise} \end{cases}\]
+
+This is an impulse reponse of the filter cutting all the frequencies above the k-th one. Recall that the $N-k$ element in DFT vector corresponds to the negative oscillation with the frequency $k$, due to cyclicity of $e^{\frac{2\pi i j x}{N}}$.
+
+Using the formula for \ref{eq:IDFT}:
+\[\begin{aligned}
+		y_{j} = \sum_{l=0}^{N-1} F_{jl} z_k
+		= \sum_{l=0}^{k} F_{jl} + \sum_{l=N-k}^{N-1} F_{jl}
+		= \frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k} \omega_N^{jl} + \sum_{l=N-k}^{N-1} \omega_N^{jl} \right)
+	\end{aligned}\]
+
+Substitute $l = N-m-1$ in the second sum:
+\[\begin{aligned}
+		\frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k} \omega_N^{jl} + \sum_{l=N-k}^{N-1} \omega_N^{jl} \right) =
+		\frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k} \omega_N^{jl} + \sum_{m=0}^{k-1} \omega_N^{j(N-m-1)} \right)
+		 & =                                               \\ \frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k} \omega_N^{jl} + \sum_{m=0}^{k-1} \omega_N^{j(N-m-1)} \right)
+		=\frac{1}{\sqrt{N}} \left(\sum_{l=0}^{k} \omega_N^{jl} + \sum_{m=0}^{k-1} \omega_N^{jN} \omega_N^{-j} \omega_N^{-jm} \right)
+		 & \underset{\ref{lm:roots of unity cyclicity}}{=} \\ \frac{1}{\sqrt{N}} \left(\omega_N^{jk} + \sum_{l=0}^{k-1} \omega_N^{jl} + \omega_N^{-j} \sum_{m=0}^{k-1} \omega_N^{-jm} \right)
+	\end{aligned}\]
+
+Let $j\neq 0$. Using the sum of geometric series:
+\[\sum_{l=0}^{k-1} \omega_N^{jl} = \sum_{l=0}^{k-1} {\left(\omega_N^{j}\right)}^l = \frac{1 - {\left(\omega_N^{j}\right)}^k}{1 - \omega_N^j}\]
+
+Similarly:
+\[\begin{aligned}
+		\omega_N^{-j}\sum_{m=0}^{k-1} \omega_N^{-jm}
+		= \omega_N^{-j}\sum_{m=0}^{k-1} {\left(\omega_N^{-j}\right)}^m
+		= \frac{\omega_N^{-j} - \omega_N^{-j}{\left(\omega_N^{-j}\right)}^k}{1 - \omega_N^{-j}}
+		 & = \\ \frac{\omega_N^{-j} - \omega_N^{-j}{\left(\omega_N^{-j}\right)}^k}{1 - \omega_N^{-j}} \frac{\omega_N^j}{\omega_N^j}
+		= \frac{1 - {\left(\omega_N^{-j}\right)}^k}{\omega_N^{j} - 1}
+		= \frac{{\left(\omega_N^{-j}\right)}^k - 1}{1 - \omega_N^{j}}
+	\end{aligned}\]
+
+By combining the terms together:
+\[
+	\sum_{l=0}^{k-1} \omega_N^{jl} + \omega_N^{-j} \sum_{l=0}^{k-1} \omega_N^{-jl}
+	= \frac{1 - {\left(\omega_N^{j}\right)}^k}{1 - \omega_N^j} + \frac{{\left(\omega_N^{-j}\right)}^k - 1}{1 - \omega_N^{j}}
+	= \frac{\omega^{-jk} - \omega^{jk}}{1 - \omega_N^{j}}\]
+
+This yields the following expression for $y_j$, when $j\neq 0$:
+\[y_{j}  = \frac{1}{\sqrt{N}} \left(\omega_N^{jk} + \frac{\omega_N^{-jk} - \omega_N^{jk}}{1 - \omega_N^{j}} \right)\]
+
+If $j = 0$, then all the summands are equal to one, so get just $(2k+1)/\sqrt{N}$.
+By the Theorem $\ref{thm:discrete convolution theorem}$:
+\[\frac{1}{\sqrt N}(F(x\circledast y)) = Fx \odot Fy\]
+which allows us to implement the low pass filter using its impulse response. That is the point, where theory meets the real world example and makes use of the abstract theorem. In general this concept can be generalaized to any signal, which can be used, for instance for reverb implementation if we have an impulse response of a room (a recording of echo induced by a short impact).
+
+Now we take a closer look on the expression we have derived above:
+\[
+	e^{-ix}-e^{ix} = 2\imag(e^{-ix}) = 2i\sin(-x) = -2i\sin(x)\]
+\[
+	1-e^{ix}
+	= e^{\frac{ix}{2}}\left(e^{-\frac{ix}{2}} - e^{\frac{ix}{2}}\right)
+	= -2i\cdot e^{\frac{ix}{2}} \sin \left(\frac{x}{2}\right)\]
+
+Therefore:
+\[
+	1 - \omega_N^{j} = 1-e^{2\pi i\frac{j}{N}}
+	= -2i\cdot e^{\frac{\pi i\cdot j}{N}} \sin \left(\frac{\pi j}{N}\right)\]
+\[
+	\omega_N^{-jk} - \omega_N^{jk}
+	= e^{-2\pi i\frac{kj}{N}}-e^{2\pi i\frac{kj}{N}}
+	= -2i \sin\left(\frac{2\pi kj}{N}\right)\]
+\[
+	\frac{\omega_N^{-jk} - \omega_N^{jk}}{1 - \omega_N^{j}}
+	= \frac{-2i \sin\left(\frac{2\pi kj}{N}\right)}{-2i\cdot e^{\frac{\pi i\cdot j}{N}} \sin \left(\frac{\pi j}{N}\right)}
+	= \frac{e^{-\frac{\pi i\cdot j}{N}} \sin\left(\frac{2\pi kj}{N}\right)}{\sin \left(\frac{\pi j}{N}\right)}\]
+
+With $x_j = 2\pi j / N$ we have:
+\[
+	\frac{e^{-\frac{\pi i\cdot j}{N}} \sin\left(\frac{2\pi kj}{N}\right)}{\sin \left(\frac{\pi j}{N}\right)}
+	= \frac{e^{-ix_j/2} \sin\left(kx_j\right)}{\sin \left(x_j/2\right)}
+	= \frac{\cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)} - i \sin\left(kx_j\right)\]
+
+Add the term $\omega_N^{jk}$ we had previously:
+\begin{equation}
+	\begin{aligned}
+		\omega_N^{jk} + \frac{\cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)} - i \sin(kx_j)
+		 & = \\ \cos(kx_j) + i \sin(kx_j) + \frac{\cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)} - i \sin(kx_j)
+		 & = \\ \cos(kx_j) + \frac{\cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)}
+		 & = \\ \frac{\cos(kx_j) \sin(x_j/2) + \cos(x_j/2) \sin(kx_j)}{\sin(x_j/2)}
+	\end{aligned}
+	\label{eq:lpf before trig id}
+\end{equation}
+
+Using the equality $\sin(x+y) = \sin(x)\cos(y) + \sin(y)\cos(x)$:
+\[\eqref{eq:lpf before trig id} =\frac{\sin((k+1/2)x_j)}{\sin(x_j/2)}\]
+\[y_j = \begin{cases}
+		\frac{1}{\sqrt{N}}\frac{\sin((k+1/2)x_j)}{\sin(x_j/2)}, \;  j\in \{1, \dots, N-1\} \\
+		(2k+1)/\sqrt{N}, \; j = 0
+	\end{cases}\]
+
+Miraculously we got a continuous Dirichlet kernel, discretized at points $x_j$. One can show, that the impulse response of Dirichlet kernel in continuous space acts in the exact same way, namely cuts the frequencies above the k-th one. As we had seen in equation \eqref{eq:IDFT unnormalized}, $z_k = \sum_{n \in \Z} \hat{f}(k+nN)$, so given that $\widehat{D_n}(k) = \begin{cases}
+		1, k \leq n \\
+		0, \; \text{otherwise}
+	\end{cases}$, this result was not completely unexpected.

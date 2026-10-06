@@ -9,6 +9,7 @@
 \usepackage{fontawesome5}
 \usepackage[margin=2cm]{geometry}
 \usepackage{caption}
+\usepackage[plain,ruled,vlined]{algorithm2e}
 \usepackage{hyperref}
 \usepackage{cleveref}
 \usetikzlibrary{patterns.meta}
@@ -61,11 +62,11 @@
 
 %blocks%
 \newtheorem{theorem}{Theorem}[section]
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
 \newtheorem{lemma}{Lemma}[section]
 \theoremstyle{remark}
 \newtheorem{remark}{Remark}[section]
-\theoremstyle{definition}
-\newtheorem{algorithm}{Algorithm}[section]
 \theoremstyle{remark}
 \newtheorem{example}{Example}[section]
 
@@ -85,9 +86,9 @@
 \section{FFT}
 \input{fft.tex}
 
-\newpage
-\subsection{Ideal LPF}\label{sec:ideal lpf}
-\input{ideal_lowpass.tex}
+\clearpage
+\section{Finite impulse response filters}
+\input{fir.tex}
 
 \newpage
 \section{Infinite impulse response filters}
@@ -97,9 +98,9 @@
 \section{Minimum phase}
 \input{minimum_phase.tex}
 
-\newpage
-\section{Appendix}
-\input{appendix.tex}
+%\newpage
+%\section{Appendix}
+%\input{appendix.tex}
 
 \bibliographystyle{plain}
 \bibliography{ref}
