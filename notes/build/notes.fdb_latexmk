@@ -1,22 +1,22 @@
 # Fdb version 4
-["bibtex build/notes"] 1791312117.31708 "build/notes.aux" "build/notes.bbl" "build/notes" 1791312121.01422 0
+["bibtex build/notes"] 1791451128.41418 "build/notes.aux" "build/notes.bbl" "build/notes" 1791454021.25353 0
   "./ref.bib" 1790093837 285 d1d65181be16ab1e9bc7b83ae9eb82ab ""
-  "build/notes.aux" 1791312119 10374 2a6ff215727d6f34f8e6ff41e3490cd2 "pdflatex"
+  "build/notes.aux" 1791454020 10812 f66829f808da59c20ba5d3ab9a599cb3 "pdflatex"
   "c:/texlive/2025/texmf-dist/bibtex/bst/base/plain.bst" 1765025282 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
   (generated)
   "build/notes.bbl"
   "build/notes.blg"
   (rewritten before read)
-["pdflatex"] 1791312117.80855 "c:/Documents/python projects/dft/notes/notes.tex" "build/notes.pdf" "notes" 1791312121.01469 0
-  "../plots/notch_freq_response.pdf" 1790021018 12833 abc576ff961fdac5d57bbc2169776ad6 ""
-  "../plots/notch_freq_response_unscaled.pdf" 1790021018 10637 4dc88f5abcd960747dd0528d2c4f2481 ""
-  "../plots/notch_phase_response.pdf" 1790021018 12681 5e42c0a32857054caa7df6ed6e9ff970 ""
-  "../plots/notch_topology.pdf" 1790021017 1858662 31fbea8090b5c1393ebf19c3b2cce77d ""
-  "build/notes.aux" 1791312119 10374 2a6ff215727d6f34f8e6ff41e3490cd2 "pdflatex"
-  "build/notes.bbl" 1791312117 235 949c0a79d63c73fa981a144fa58ad51b "bibtex build/notes"
-  "build/notes.out" 1791312119 1446 62879060ed3f943617eb2aa34797af27 "pdflatex"
-  "build/notes.toc" 1791312119 901 65b47b49db74504647a0f03f6eae8512 "pdflatex"
-  "c:/Documents/python projects/dft/notes/notes.tex" 1791312113 2471 a276cf0bd1176677a85041ba8eeb64e0 ""
+["pdflatex"] 1791454018.2102 "c:/Documents/python projects/dft/notes/notes.tex" "build/notes.pdf" "notes" 1791454021.25413 0
+  "../plots/notch_freq_response.pdf" 1791454017 12833 3360284cdacdf7c0779bf8dd9588807c ""
+  "../plots/notch_freq_response_unscaled.pdf" 1791454017 10637 1283b37649a3dc540d0955ebaa5ae575 ""
+  "../plots/notch_phase_response.pdf" 1791454017 12681 2b71cf343913af767c096f5f4b939b68 ""
+  "../plots/notch_topology.pdf" 1791454017 1858662 5a3547b7582f464e9fff91ee7cd754c4 ""
+  "build/notes.aux" 1791454020 10812 f66829f808da59c20ba5d3ab9a599cb3 "pdflatex"
+  "build/notes.bbl" 1791451128 235 949c0a79d63c73fa981a144fa58ad51b "bibtex build/notes"
+  "build/notes.out" 1791454020 1612 0be3c11045967f9e6378fe34999bb9f1 "pdflatex"
+  "build/notes.toc" 1791454020 988 1fc0cd230f2ca8af874749582250a6f5 "pdflatex"
+  "c:/Documents/python projects/dft/notes/notes.tex" 1791449274 2408 b308e5cd66d257a6cf9ff68e2bed12d6 ""
   "c:/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1765025561 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "c:/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1765026271 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "c:/texlive/2025/texmf-dist/fonts/tfm/jknappen/ec/tcrm1200.tfm" 1765025947 1536 74b7293ec3713bb7fdca8dd1bd1f469c ""
@@ -206,11 +206,11 @@
   "c:/texlive/2025/texmf.cnf" 1765029160 713 e69b156964470283e0530f5060668171 ""
   "conventions.tex" 1790020310 621 41466ff1959a88054cb7c69ac47e549c ""
   "dft.tex" 1790020341 12840 99cf6787eeb7ff84c5349158656d8cbe ""
-  "fft.tex" 1791311968 2830 b4502e1e288d766d710f0bf6c428844e ""
+  "fft.tex" 1791449306 2833 ba180d69195376e636c180ee1d2276c6 ""
   "fir.tex" 1791312102 12096 72d2d26225b8198766a2efceaf937a99 ""
-  "iir.tex" 1790093881 26423 63a30fca97db8d9eb05d09f1613a20da ""
-  "minimum_phase.tex" 1791311437 17650 dd6e2aadf08afbd9bf40c347692058f2 ""
-  "notes.tex" 1791312113 2471 a276cf0bd1176677a85041ba8eeb64e0 ""
+  "iir.tex" 1791449290 26403 a01dbe601418fe648974342403b0ad5d ""
+  "minimum_phase.tex" 1791451311 19626 6791ca8944fe0630d73aefaf1c4ccf8e ""
+  "notes.tex" 1791449274 2408 b308e5cd66d257a6cf9ff68e2bed12d6 ""
   (generated)
   "build/notes.aux"
   "build/notes.log"

@@ -61,7 +61,7 @@ where we assume that the Fourier transform of $s[n]$ exists, so that in the step
                     Thus:
                     \[Y(\omega)
                         = H(\omega) X(\omega)
-                        = \frac{1}{2} e^{i\phi_0} S(e^{i(\omega - \omega_0)})\]
+                        = \frac{1}{2} e^{-i\phi_0} S(e^{i(\omega - \omega_0)})\]
           \end{enumerate}
 
           We take the inverse Fourier transform:
@@ -155,9 +155,9 @@ where we assume that the Fourier transform of $s[n]$ exists, so that in the step
     \item Since $x[n]$ is narrowband we have that $X(\omega)$ is non-zero in the neighbourhood $\omega_0 \pm \Delta$ and $-\omega_0 \pm \Delta$ so for the output signal we care only about those parts as $Y(\omega) = X(\omega) H(\omega)$. Using the basic property of z-transform $\bar{x} \ztransform \overline{X(\bar{z})}$ we get that for the real valued signal the phase is inverted when the argument is conjugated as $x = \bar{x} \ztransform \overline{X(\bar{z})} \Rightarrow X(\bar{z}) = \overline{X(\bar{\bar{z}})} = \overline{X(z)}$. As we assume both signals $x$ and $y$ to be real valued this property automatically holds for $H$
 
           In the neighbourhood of $\omega_0$ the linear approximation takes the form:
-          \[\arg H(\omega) \approx \arg H(\omega_0) + \partial_\omega(\arg H)(\omega) \cdot (\omega - \omega_0)\]
+          \[\arg H(\omega) \approx \arg H(e^{i\omega_0}) + \partial_\omega(\arg H)(e^{i\omega_0}) \cdot (\omega - \omega_0)\]
 
-          Define $\tau_{gr} = -\partial_\omega(\arg H) (\omega)$ and $\tau_{ph} = -(1 / \omega_0) \arg H(\omega_0)$. In terms of the Figure~\ref{fig:phase response inclined shelf} it becomes $-\phi_1 = \arg H(\omega_0) = -\omega_0 \tau_{ph}$ and $\text{slope} = -n_d = -\tau_{gr} \Rightarrow n_d = \tau_{gr}$. Plugging this into \eqref{eq:phase shift harmonic}:
+          Define $\tau_{gr} = -\partial_\omega(\arg H) (e^{i\omega_0})$ and $\tau_{ph} = -(1 / \omega_0) \arg H(e^{i\omega_0})$. In terms of the Figure~\ref{fig:phase response inclined shelf} it becomes $-\phi_1 = \arg H(e^{i\omega_0}) = -\omega_0 \tau_{ph}$ and $\text{slope} = -n_d = -\tau_{gr} \Rightarrow n_d = \tau_{gr}$. Plugging this into \eqref{eq:phase shift harmonic}:
           \begin{equation} \label{eq:group delay}
               y[n] = s[n - n_d] \cos(\omega_0 n - \phi_1)
               = s[n - \tau_{gr}] \cos(\omega_0 n - \omega_0 \tau_{ph})
@@ -165,7 +165,7 @@ where we assume that the Fourier transform of $s[n]$ exists, so that in the step
           \end{equation}
 \end{enumerate}
 
-\subsection{All-pass}
+\subsection{All-pass} \label{sec:allpass}
 \begin{definition}
     We define a single pole all-pass system:
     \[H_{ap}(z) = \frac{z^{-1} - \bar{a}}{1 - az^{-1}}\]
@@ -173,7 +173,7 @@ where we assume that the Fourier transform of $s[n]$ exists, so that in the step
 \begin{lemma}[Properties of all-pass systems]
     Suppose $a = r e^{i \theta}$, where $0 \leq r < 1$. Then:
     \begin{enumerate}
-        \item $|H_{ap}(e^{i\omega})| = 1 \; \forall \omega \in [0, 2\pi]$
+        \item \label{lem:allpass const} $|H_{ap}(e^{i\omega})| = 1 \; \forall \omega \in [0, 2\pi]$
         \item \label{lem:allpass group delay} $\grd(\omega) = \frac{1 - r^2}{1 - 2r \cos (\omega - \theta) + r^2}$
     \end{enumerate}
 \end{lemma}
@@ -242,29 +242,47 @@ where we assume that the Fourier transform of $s[n]$ exists, so that in the step
               \end{enumerate}
 
               Thus:
-              \[\grd(\omega) 
-              = - \partial_\omega{(\arg{H_{ap}(e^{i\omega})})} 
-              = \frac{1 - r^2}{1 - 2r \cos (\omega - \theta) + r^2}\]
+              \[\grd(\omega)
+                  = - \partial_\omega{(\arg{H_{ap}(e^{i\omega})})}
+                  = \frac{1 - r^2}{1 - 2r \cos (\omega - \theta) + r^2}\]
               which is non-negative since $0 \leq r < 1$, hence $-2r \cos(\omega - \theta) \geq -2r$, so:
-              \[1 - 2r \cos (\omega - \theta) + r^2 
-              \geq 1 - 2r + r^2
-              = (1 - r)^2 > 0\]
+              \[1 - 2r \cos (\omega - \theta) + r^2
+                  \geq 1 - 2r + r^2
+                  = (1 - r)^2 > 0\]
     \end{enumerate}
 \end{proof}
 
 By cascading two all-pass filters with the conjugate poles we get:
-\[H_{ap}(z) 
-= \frac{z^{-1} - \bar{a}}{1 - az^{-1}} \frac{z^{-1} - a}{1 - \bar{a}z^{-1}}
-=  \frac{z^{-2} - (\bar{a} + a) z^{-1} + |a|^2}{1 - (\bar{a} + a) z^{-1} + |a|^2 z^{-2}}\]
+\[H_{ap}(z)
+    = \frac{z^{-1} - \bar{a}}{1 - az^{-1}} \frac{z^{-1} - a}{1 - \bar{a}z^{-1}}
+    =  \frac{z^{-2} - (\bar{a} + a) z^{-1} + |a|^2}{1 - (\bar{a} + a) z^{-1} + |a|^2 z^{-2}}\]
 with all the real coefficients as $a + \bar{a} = 2\real(a)$
 
 By Lemma~\ref{lem:allpass group delay} we have that the group delay of the both parts is non-negative, hence the group delay of the whole system is non-negative as well as the phases add up. By Mean Value Theorem:
 \[\frac{\arg H_{ap}(e^{i\omega}) - \arg H_{ap}(e^{i \cdot 0})}{\omega}
-= \partial_{\omega} \arg H_{ap}(e^{i\omega'}) \leq 0\]
+    = \partial_{\omega} \arg H_{ap}(e^{i\omega'}) \leq 0\]
 for some $\omega' \in (0, \omega)$
 
-\[H_{ap}(1) = 
-\frac{1 - 2 \real(a) + |a|^2}{1 - 2\real{a} + |a|^2}
-= 1 \Rightarrow \arg H_{ap}(e^{i \cdot 0}) = 0\]
+\[H_{ap}(1) =
+    \frac{1 - 2 \real(a) + |a|^2}{1 - 2\real{a} + |a|^2}
+    = 1 \Rightarrow \arg H_{ap}(e^{i \cdot 0}) = 0\]
 thus:
 \[\arg H_{ap}(e^{i\omega}) = \omega \cdot \partial_{\omega} \arg H_{ap}(e^{i\omega'}) \leq 0 \; \forall \omega \in [0, \pi]\]
+
+\subsection{All-pass decompostion}
+Let $H$ be a stable causal system with real-valued coefficients. Then for any zero it holds that its conjugate must be zero as well. Suppose $H$ has a zero outside of the unit circle, namely at $z = 1/(c)$. Then it has a zero at $z = 1/(\bar{c})$ which we can factor out:
+\begin{align*}
+    H(z)
+     & = \tilde{H}(z) \cdot (1 - 1/c \cdot z^{-1}) (1 - 1/\bar{c} \cdot z^{-1})
+    \\ &= \frac{1}{|c|^2} \tilde{H}(z) \cdot (c - z^{-1}) (\bar{c} - z^{-1})
+    \\ &= \frac{1}{|c|^2}\tilde{H}(z) \cdot \frac{1 - c z^{-1}}{1 - c z^{-1}}(c - z^{-1}) \cdot \frac{1 - \bar{c} z^{-1}}{1 - \bar{c} z^{-1}}(\bar{c} - z^{-1})
+    \\ &= \frac{1}{|c|^2}\tilde{H}(z) \cdot (1 - c z^{-1}) (1 - \bar{c} z^{-1}) \cdot \frac{c - z^{-1}}{1 - \bar{c} z^{-1}} \cdot \frac{\bar{c} - z^{-1}}{1 - c z^{-1}}
+\end{align*}
+
+\begin{remark}
+    The decomposition above holds for real-valued zeros too, but requires factoring out a single pole all-pass filter.
+\end{remark}
+
+We have split the original system into the cascade of the system where the zeros $1/{c}$ and $1/\bar{c}$ become $c$ and $\bar{c}$ and an all-pass system. By doing this for all the zeros outside of the unit-circle we get:
+\[H = H_{min}(z) \cdot H_{ap}(z)\]
+where $H_{ap}(z)$ is the cascade of the single all-pass filters. Using the result from Section~\ref{sec:allpass} the phase of $H_{ap}$ is non-positive, so $\arg H_{min}(e^{i\omega}) \geq \arg H(e^{i\omega}) \; \forall \omega \in [0, \pi]$, meaning that the phase delay $\tau_{ph} = -(1 / \omega_0) \arg H_{min}(e^{i\omega_0}) \leq -(1 / \omega_0) \arg H(e^{i\omega_0})$. With the same argumentation we can prove that the group delay decreases as well. When we fix the frequency reponse magnitude of the system we can reconstruct the original system up to its zeros. Since we can choose only from the original zeros of the system and the conjugate reciprocals (Section 5.4~\cite{oppenheim2010discrete}), we obtain the min-phase system by choosing only the zeros lying inside the unit circle. Otherwise with the argumentation above we can reduce phase and group delay by factoring out an all-pass system.

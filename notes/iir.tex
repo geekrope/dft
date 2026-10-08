@@ -36,7 +36,6 @@ We kick off with the example
     As in the case of Ideal low pass filter in Section~\ref{sec:ideal lpf} we got an impulse response of the filter introduced above. The only difference is that this filter has an impulse response with the size proportional to the sample size. That said the IR size grows infinitely in time unlike the IR of an ideal LPF, which has the same size for each frame.
 \end{example}
 
-\newpage
 \subsection{Stability}
 Let us consider the general form of the filters we would like to analyze:
 \begin{equation}
@@ -399,7 +398,6 @@ By Theorem~\ref{thm:convolution theorem z transform} we have that $X(z)H(z) \izt
     This is exactly the idea behind prefix sums (in particular using prefix sums to compute sliding window average).
 \end{remark}
 
-\newpage
 \subsection{Notch filter}
 We want to construct the transfer function with the zeros corresponding to the frequency $\omega$. Its numerator then is the function $(z^{-1} - e^{i\omega})(z^{-1} - e^{-i\omega})$ since we need to cancel both positive and negative frequency oscillations. If we define the transfer function as is the frequency response looks as in the Figure~{fig:notch unscaled freq response}
 
